@@ -20,7 +20,7 @@ game_speed = 10
 
 # Создаем объекты персонажа и менеджера уровней
 player = Player(x=100, floor_y=floor_y)
-level = LevelReader(lvl, floor_y=floor_y)  # Класс сам создаст шипы внутри себя!
+level = LevelReader(lvl,  floor_y=floor_y)  # Класс сам создаст шипы внутри себя!
 
 # Главный цикл игры
 running = True
@@ -42,13 +42,13 @@ while running:
     # 2. Физика и обновление позиций
     player.update(game_speed)
     level.update(game_speed)  # Уровень сам двигает свои шипы
-
+ 
     # 3. Проверка коллизий через класс уровня
     player_rect = player.get_rect()
-    if level.check_collisions(player_rect):
+    if level.check_collisions(player_rect, player, game_speed):
         print(f"Game Over! Final Score: {level.score}")
         running = False  # Столкнулись с шипом -> проиграли
-
+                        
     # 4. Отрисовка графики
     level.draw(screen)   # Сначала рисуем пол и шипы уровня
     player.draw(screen)  # Поверх рисуем крутящийся шарик

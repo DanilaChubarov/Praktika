@@ -33,7 +33,6 @@ while running:
     clock.tick(FPS)
     lvl.update()
     lvl.draw_background(screen)
-    # screen.blit(lvl.bg_image, (0, 0))  # Очищаем экран фоном
 
     # 1. Обработка событий
     for event in pygame.event.get():

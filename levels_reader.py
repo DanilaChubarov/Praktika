@@ -5,6 +5,7 @@ class LevelReader:
     def __init__(self, lvl, floor_y):
         self.floor_y = floor_y
         self.score = 0
+        self.world_offset = 0  # Отслеживание прогресса уровня
         
         self.obstacles = []       # Список Rect для обычных шипов
         self.ceil_obstacles = []  # Список Rect для перевернутых шипов
@@ -31,6 +32,10 @@ class LevelReader:
 
     def update(self, game_speed):
         """Двигает абсолютно все типы объектов влево"""
+        # Увеличиваем счетчик прогресса
+        self.world_offset += game_speed
+        self.score += game_speed  # Счет зависит от прогресса
+        
         # Движение обычных шипов
         for spike in self.obstacles:
             spike.x -= game_speed
@@ -46,7 +51,7 @@ class LevelReader:
             plat.x -= game_speed
         self.platforms = [p for p in self.platforms if p.right > 0]
 
-    def check_collisions(self, player_rect, player, game_speed):
+    def check_collisions(self, player_rect, player, game_speed, space_held=False):
         """Проверяет столкновения со всеми объектами на разной высоте"""
         
         # 1. Смерть от обычных шипов
@@ -71,7 +76,16 @@ class LevelReader:
                         player.y = plat.top - player.size  # Ставим строго на крышу
                         player.vel_y = 0
                         player.is_jumping = False
+                        player.can_jump = True
                         player.on_platform = True
+                        
+                        # Если пробел зажат И мы были в воздухе И не только что приземлились
+                        if space_held and player.was_in_air and not player.just_landed:
+                            player.jump()
+                            player.just_landed = True
+                        
+                        player.was_in_air = False
+                        
                         # Обновляем хитбокс игрока под новую безопасную координату Y
                         player_rect.y = player.y
 

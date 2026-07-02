@@ -10,10 +10,10 @@ class LevelOne:
             "                                                                   ",
             "                                                                   ",
             "                     PPPPPP          PPPPPP                        ",  # Верхний ярус платформ
-            "                       XX              XX                          ",  # Шипы НА платформах
+            "                       MM              MM                          ",  # Шипы НА платформах
             "                                                                   ",
             "               PPPP                                                ",  # Нижний ярус платформ
-            "                XX                                                 ",
+            "                MM                                                 ",
             "          PPP                                                      ",
             "    PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP   ",  # Шипы на основном полу
         ]

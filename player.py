@@ -19,7 +19,7 @@ class Player:
         self.just_landed = False  # Флаг для защиты от дребезга
         
         # Загрузка текстуры
-        self.texture = pygame.image.load("basket_ball.png").convert_alpha()
+        self.texture = pygame.image.load("media/textures/basket_ball.png").convert_alpha()
         self.texture = pygame.transform.scale(self.texture, (self.size, self.size))
 
     def jump(self):

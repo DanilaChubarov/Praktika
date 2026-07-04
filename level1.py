@@ -18,10 +18,11 @@ class LevelOne:
             "    PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP   ",  # Шипы на основном полу
         ]
         # ===== ФОН С ДВИЖЕНИЕМ =====
-        self.bg_image = pygame.image.load("41524.jpg").convert()
+        self.bg_image = pygame.image.load("media/background/level1_bg.jpg").convert()
         self.bg_image = pygame.transform.scale(
             self.bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT)
         )
+        self.music = pygame
         self.bg_x1 = 0
         self.bg_x2 = SCREEN_WIDTH
         self.game_speed = 7  # Скорость движения фона
@@ -35,10 +36,6 @@ class LevelOne:
             self.bg_x1 = self.bg_x2 + SCREEN_WIDTH
         if self.bg_x2 <= -SCREEN_WIDTH:
             self.bg_x2 = self.bg_x1 + SCREEN_WIDTH
-
-    def draw_background(self, screen):
-        screen.blit(self.bg_image, (self.bg_x1, 0))
-        screen.blit(self.bg_image, (self.bg_x2, 0))
 
     def getMap(self):
         return self.map

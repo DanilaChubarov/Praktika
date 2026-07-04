@@ -123,9 +123,11 @@ while running:
         
         # Проверка коллизий
         player_rect = player.get_rect()
-        if level.check_collisions(player_rect, player, space_held=space_pressed):
+        if level.check_collisions(player_rect, player, space_held=space_pressed)=="DEATH":
             game_state = "game_over"
-        
+        elif level.check_collisions(player_rect, player, space_held=space_pressed)=="DBL_JMP" and player.has_double_jump:
+            player.can_jump=True
+            player.has_double_jump= False
         # Проверка победы (достижение финиша)
         if level.world_offset >= FINISH_LINE:
             game_state = "victory"

@@ -13,6 +13,7 @@ from level1 import LevelOne
 
 # Инициализация Pygame
 pygame.init()
+pygame.mixer.init()
 
 # Настройка окна
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -94,6 +95,7 @@ while running:
                 running = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 game_state = "playing"
+                level.play_music()
                 space_pressed = False
                 
     elif game_state == "playing":

@@ -15,6 +15,10 @@ class LevelReader:
         self.bg_x1= lvl.bg_x1
         self.bg_x2= lvl.bg_x2
         self.bg_speed=lvl.bg_speed
+        
+        #Активация музыки
+        pygame.mixer.music.load(lvl.music_name)
+        
         BLOCK_SIZE = 40      
         START_OFFSET = 600   
         
@@ -135,4 +139,5 @@ class LevelReader:
         for c_spike in self.ceil_obstacles:
             points = [(c_spike.left, c_spike.top), (c_spike.centerx, c_spike.bottom), (c_spike.right, c_spike.top)]
             pygame.draw.polygon(screen, RED, points)
- 
+    def play_music(self):
+        pygame.mixer.music.play(-1)

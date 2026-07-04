@@ -16,14 +16,13 @@ pygame.init()
 pygame.mixer.init()
 
 # Настройка окна
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT)) 
 pygame.display.set_caption("Python Geometry Dash Clone")
 clock = pygame.time.Clock()
 
 # Переменные мира
-floor_y = SCREEN_HEIGHT - 50
-game_speed = 10
-FINISH_LINE = 3000  # Координата финиша (увеличил)
+floor_y = SCREEN_HEIGHT - 60
+FINISH_LINE = 30000  # Координата финиша (увеличил)
 
 def draw_menu():
     """Отрисовка меню"""
@@ -74,8 +73,9 @@ def draw_victory(final_score):
 def reset_game():
     """Сброс игры"""
     curr_lvl = LevelOne()
-    player = Player(x=100, floor_y=floor_y)
+    player = Player(curr_lvl, x=100, floor_y=floor_y)
     level = LevelReader(curr_lvl, floor_y=floor_y)
+    
     return player, level, curr_lvl
 
 # Инициализация игры
@@ -118,12 +118,12 @@ while running:
                 player.jump()
         
         # Физика и обновление
-        player.update(game_speed, space_held=space_pressed)
-        level.update(game_speed)
+        player.update(space_held=space_pressed)
+        level.update()
         
         # Проверка коллизий
         player_rect = player.get_rect()
-        if level.check_collisions(player_rect, player, game_speed, space_held=space_pressed):
+        if level.check_collisions(player_rect, player, space_held=space_pressed):
             game_state = "game_over"
         
         # Проверка победы (достижение финиша)

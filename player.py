@@ -2,15 +2,16 @@ import pygame
 from settings import SCREEN_HEIGHT, CYAN
 
 class Player:
-    def __init__(self, x, floor_y):
+    def __init__(self, lvl, x, floor_y):
         self.size = 40
         self.x = x
         self.floor_y = floor_y
         self.y = floor_y - self.size
+        self.game_speed = lvl.lvl_speed
         
         self.vel_y = 0
         self.gravity = 1
-        self.jump_strength = -16
+        self.jump_strength = -14
         self.is_jumping = False
         self.can_jump = True
         self.angle = 0
@@ -29,7 +30,7 @@ class Player:
             self.is_jumping = True
             self.can_jump = False
 
-    def update(self, game_speed, space_held=False):
+    def update(self, space_held=False):
         # Гравитация
         self.vel_y += self.gravity
         self.y += self.vel_y
@@ -54,7 +55,7 @@ class Player:
 
         # Вращение
         if not self.is_jumping:
-            self.angle -= game_speed * 1.5
+            self.angle -= self.game_speed * 1.5
         else:
             self.angle -= 5
 

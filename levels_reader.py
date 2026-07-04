@@ -12,7 +12,9 @@ class LevelReader:
         self.platforms = []       # Список Rect для блоков
         
         self.bg_image = pygame.transform.scale(lvl.bg_image, (SCREEN_WIDTH, self.floor_y + 50))
-        
+        self.bg_x1= lvl.bg_x1
+        self.bg_x2= lvl.bg_x2
+        self.bg_speed=lvl.bg_speed
         BLOCK_SIZE = 40      
         START_OFFSET = 600   
         
@@ -32,6 +34,15 @@ class LevelReader:
 
     def update(self, game_speed):
         """Двигает абсолютно все типы объектов влево"""
+        #Движение фона
+        
+        self.bg_x1 -= self.bg_speed
+        self.bg_x2 -= self.bg_speed
+        if self.bg_x1 <= -SCREEN_WIDTH:
+            self.bg_x1 = self.bg_x2 + SCREEN_WIDTH
+        if self.bg_x2 <= -SCREEN_WIDTH:
+            self.bg_x2 = self.bg_x1 + SCREEN_WIDTH
+            
         # Увеличиваем счетчик прогресса
         self.world_offset += game_speed
         self.score += game_speed  # Счет зависит от прогресса
@@ -104,20 +115,24 @@ class LevelReader:
 
     def draw(self, screen):
         """Отрисовка всех объектов на своих персональных высотах"""
-        # Линия основного пола
+        #1. Рисуем задний фон
+        screen.blit(self.bg_image, (self.bg_x1, 0))
+        screen.blit(self.bg_image, (self.bg_x2, 0))
+        #2 Линия основного пола
         pygame.draw.line(screen, (255, 255, 255), (0, self.floor_y), (SCREEN_WIDTH, self.floor_y), 2)
         
-        # 1. Рисуем блоки платформ
+        # 3. Рисуем блоки платформ
         for plat in self.platforms:
             pygame.draw.rect(screen, (140, 20, 140), plat) # Сделаем фиолетовыми, как на скрине
             pygame.draw.rect(screen, (0, 255, 255), plat, 1) # Голубая рамка
             
-        # 2. Рисуем правильные шипы (треугольник острием вверх)
+        # 4. Рисуем правильные шипы (треугольник острием вверх)
         for spike in self.obstacles:
             points = [(spike.left, spike.bottom), (spike.centerx, spike.top), (spike.right, spike.bottom)]
             pygame.draw.polygon(screen, RED, points)
             
-        # 3. Рисуем перевернутые шипы (треугольник острием ВНИЗ)
+        # 5. Рисуем перевернутые шипы (треугольник острием ВНИЗ)
         for c_spike in self.ceil_obstacles:
             points = [(c_spike.left, c_spike.top), (c_spike.centerx, c_spike.bottom), (c_spike.right, c_spike.top)]
             pygame.draw.polygon(screen, RED, points)
+ 

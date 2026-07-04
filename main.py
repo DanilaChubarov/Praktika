@@ -72,13 +72,13 @@ def draw_victory(final_score):
 
 def reset_game():
     """Сброс игры"""
-    lvl = LevelOne()
+    curr_lvl = LevelOne()
     player = Player(x=100, floor_y=floor_y)
-    level = LevelReader(lvl, floor_y=floor_y)
-    return player, level, lvl
+    level = LevelReader(curr_lvl, floor_y=floor_y)
+    return player, level, curr_lvl
 
 # Инициализация игры
-player, level, lvl = reset_game()
+player, level, curr_lvl = reset_game()
 game_state = "menu"  # "menu", "playing", "game_over", "victory"
 space_pressed = False
 
@@ -97,9 +97,6 @@ while running:
                 space_pressed = False
                 
     elif game_state == "playing":
-        lvl.update()
-        lvl.draw_background(screen)
-        
         # Обработка событий
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

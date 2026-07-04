@@ -11,6 +11,8 @@ class LevelReader:
         self.ceil_obstacles = []  # Список Rect для перевернутых шипов
         self.platforms = []       # Список Rect для блоков
         self.slabs = [] #Список полублоков
+        self.dj_orbs = [] #Список орбов для doublejump
+        
         
         self.bg_image = pygame.transform.scale(lvl.bg_image, (SCREEN_WIDTH, self.floor_y + 50))
         self.bg_x1= lvl.bg_x1
@@ -22,6 +24,9 @@ class LevelReader:
         
         BLOCK_SIZE = 40      
         START_OFFSET = 0  
+        
+        self.dj_orb_texture = pygame.image.load("media/textures/double_jump.png").convert_alpha()
+        self.dj_orb_texture = pygame.transform.scale(self.dj_orb_texture, (BLOCK_SIZE, BLOCK_SIZE))
         
         # Читаем всю сетку карты
         for row_index, row in enumerate(lvl.map):
@@ -38,11 +43,11 @@ class LevelReader:
                     self.ceil_obstacles.append(pygame.Rect(x, y, BLOCK_SIZE, BLOCK_SIZE))
                 elif char == "S":
                     self.slabs.append(pygame.Rect(x, y,BLOCK_SIZE, BLOCK_SIZE//2 ))
+                elif char == "D" :
+                    self.dj_orbs.append(pygame.Rect(x, y,BLOCK_SIZE+5, BLOCK_SIZE+5 ))
 
     def update(self):
-        """Двигает абсолютно все типы объектов влево"""
-        #Движение фона
-        
+        #Задний фон движение
         self.bg_x1 -= self.bg_speed
         self.bg_x2 -= self.bg_speed
         if self.bg_x1 <= -SCREEN_WIDTH:
@@ -54,41 +59,36 @@ class LevelReader:
         self.world_offset += self.game_speed
         self.score += self.game_speed  # Счет зависит от прогресса
         
-        # Движение обычных шипов
-        for spike in self.obstacles:
+        for spike in self.obstacles:   #Шипы
             spike.x -= self.game_speed
         self.obstacles = [s for s in self.obstacles if s.right > 0]
-
-        # Движение перевернутых шипов
-        for c_spike in self.ceil_obstacles:
+        for c_spike in self.ceil_obstacles: #Перевёрнутые шипы
             c_spike.x -= self.game_speed
         self.ceil_obstacles = [s for s in self.ceil_obstacles if s.right > 0]
-
-        # Движение платформ
-        for plat in self.platforms:
+        for plat in self.platforms: # Движение платформ
             plat.x -= self.game_speed
         self.platforms = [p for p in self.platforms if p.right > 0]
-        
-        #Движение полублоков
-        for slab in self.slabs:
+        for slab in self.slabs:#Движение полублоков
             slab.x -= self.game_speed
         self.slabs = [s for s in self.slabs if s.right > 0]
+        for orb in self.dj_orbs:       #Движение орбов
+            orb.x -= self.game_speed
+        self.dj_orbs = [orb for orb in self.dj_orbs if orb.right > 0]
         
         #Движение 
-
     def check_collisions(self, player_rect, player, space_held=False):
-        """Проверяет столкновения со всеми объектами на разной высоте"""
-        
-        # 1. Смерть от обычных шипов
-        for spike in self.obstacles:
+        for spike in self.obstacles:# 1. Смерть от обычных шипов
             if player_rect.colliderect(spike):
-                return True
-                
-        # 2. Смерть от перевернутых шипов (потолочных)
-        for c_spike in self.ceil_obstacles:
+                return "DEATH"
+        for c_spike in self.ceil_obstacles: # 2. Смерть от перевернутых шипов (потолочных)
             if player_rect.colliderect(c_spike):
-                return True
-                
+                return "DEATH"
+        for orb in self.dj_orbs:
+            if player_rect.colliderect(orb):
+                self.dj_orbs.remove(orb)
+                player.has_double_jump = True
+                player.can_jump = True
+                return "DBL_JMP"
         # 3. Физика платформ (Приземление сверху)
         player.on_platform = False  
         
@@ -122,13 +122,12 @@ class LevelReader:
                 if player_rect.right > plat.left and player_rect.left < plat.left:
                     # И мы находимся на уровне стены, а не пролетаем над ней
                     if player_rect.bottom > plat.top + 5:
-                        return True # Честная смерть от удара в стену
+                        return "DEATH" # Честная смерть от удара в стену
                         
-        return False
+        return "FALSE"
 
 
     def draw(self, screen):
-        """Отрисовка всех объектов на своих персональных высотах"""
         #1. Рисуем задний фон
         screen.blit(self.bg_image, (self.bg_x1, 0))
         screen.blit(self.bg_image, (self.bg_x2, 0))
@@ -153,5 +152,7 @@ class LevelReader:
         for c_spike in self.ceil_obstacles:
             points = [(c_spike.left, c_spike.top), (c_spike.centerx, c_spike.bottom), (c_spike.right, c_spike.top)]
             pygame.draw.polygon(screen, RED, points)
+        for orb in self.dj_orbs:
+            screen.blit(self.dj_orb_texture, (orb.x, orb.y))
     def play_music(self):
         pygame.mixer.music.play(-1)

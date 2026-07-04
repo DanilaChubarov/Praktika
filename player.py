@@ -14,6 +14,7 @@ class Player:
         self.jump_strength = -14
         self.is_jumping = False
         self.can_jump = True
+        self.has_double_jump = False
         self.angle = 0
         self.on_platform = False
         self.was_in_air = False  # Флаг для отслеживания приземления

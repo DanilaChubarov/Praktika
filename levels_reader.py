@@ -12,7 +12,7 @@ class LevelReader:
         self.platforms = []       # Список Rect для блоков
         self.slabs = [] #Список полублоков
         self.dj_orbs = [] #Список орбов для doublejump
-        
+        self.gr_orbs = [] #Список орбов гравитации
         
         self.bg_image = pygame.transform.scale(lvl.bg_image, (SCREEN_WIDTH, self.floor_y + 50))
         self.bg_x1= lvl.bg_x1
@@ -28,6 +28,8 @@ class LevelReader:
         self.dj_orb_texture = pygame.image.load("media/textures/double_jump.png").convert_alpha()
         self.dj_orb_texture = pygame.transform.scale(self.dj_orb_texture, (BLOCK_SIZE, BLOCK_SIZE))
         
+        self.gr_orb_texture = pygame.image.load("media/textures/gravity_orb.png").convert_alpha()
+        self.gr_orb_texture = pygame.transform.scale(self.gr_orb_texture, (BLOCK_SIZE, BLOCK_SIZE))
         # Читаем всю сетку карты
         for row_index, row in enumerate(lvl.map):
             for col_index, char in enumerate(row):
@@ -45,6 +47,8 @@ class LevelReader:
                     self.slabs.append(pygame.Rect(x, y,BLOCK_SIZE, BLOCK_SIZE//2 ))
                 elif char == "D" :
                     self.dj_orbs.append(pygame.Rect(x, y,BLOCK_SIZE+5, BLOCK_SIZE+5 ))
+                elif char == "G" :
+                    self.gr_orbs.append(pygame.Rect(x, y,BLOCK_SIZE+5, BLOCK_SIZE+5 ))
 
     def update(self):
         #Задний фон движение
@@ -74,6 +78,9 @@ class LevelReader:
         for orb in self.dj_orbs:       #Движение орбов
             orb.x -= self.game_speed
         self.dj_orbs = [orb for orb in self.dj_orbs if orb.right > 0]
+        for orb in self.gr_orbs:       #Движение орбов
+            orb.x -= self.game_speed
+        self.gr_orbs = [orb for orb in self.gr_orbs if orb.right > 0]
         
         #Движение 
     def check_collisions(self, player_rect, player, space_held=False):
@@ -89,6 +96,14 @@ class LevelReader:
                 player.has_double_jump = True
                 player.can_jump = True
                 return "DBL_JMP"
+        for orb in self.gr_orbs:
+            if player_rect.colliderect(orb):
+                player.has_double_jump = True
+                player.can_jump = True
+                if player.used_orb:
+                    self.gr_orbs.remove(orb)
+                    player.used_orb = False
+                return "GRAVITY_CHANGE"    
         # 3. Физика платформ (Приземление сверху)
         player.on_platform = False  
         
@@ -125,9 +140,10 @@ class LevelReader:
                 # Если правый край шара заехал за левый край платформы
                 if player_rect.right > plat.left and player_rect.left < plat.left:
                     # И мы находимся на уровне стены, а не пролетаем над ней
-                    if player_rect.bottom > plat.top + 5:
+                    if player_rect.bottom > plat.top + 5 and player.gravity > 0:
                         return "DEATH" # Честная смерть от удара в стену
-                        
+                    if player_rect.top < plat.bottom - 5 and player.gravity < 0:
+                        return "DEATH" # Честная смерть от удара в стену   
         return "FALSE"
 
 
@@ -158,5 +174,7 @@ class LevelReader:
             pygame.draw.polygon(screen, RED, points)
         for orb in self.dj_orbs:
             screen.blit(self.dj_orb_texture, (orb.x, orb.y))
+        for orb in self.gr_orbs:
+            screen.blit(self.gr_orb_texture, (orb.x, orb.y))
     def play_music(self):
         pygame.mixer.music.play(-1)

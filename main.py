@@ -128,6 +128,15 @@ while running:
         elif level.check_collisions(player_rect, player, space_held=space_pressed)=="DBL_JMP" and player.has_double_jump:
             player.can_jump=True
             player.has_double_jump= False
+        elif level.check_collisions(player_rect, player, space_held=space_pressed)=="GRAVITY_CHANGE" :
+            if space_pressed:
+                player.gravity *= -1
+                player.jump_strength *= -1
+                player.used_orb = True
+                if player.has_double_jump:
+                    player.can_jump = True
+                    player.has_double_jump = False
+                player.jump()
         # Проверка победы (достижение финиша)
         if level.world_offset >= FINISH_LINE:
             game_state = "victory"

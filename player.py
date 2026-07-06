@@ -19,6 +19,7 @@ class Player:
         self.on_platform = False
         self.was_in_air = False  # Флаг для отслеживания приземления
         self.just_landed = False  # Флаг для защиты от дребезга
+        self.used_orb = False
         
         # Загрузка текстуры
         self.texture = pygame.image.load("media/textures/basket_ball.png").convert_alpha()

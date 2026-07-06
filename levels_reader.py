@@ -108,47 +108,31 @@ class LevelReader:
         player.on_platform = False  
         
         for plat in self.platforms + self.slabs:
-            if player_rect.colliderect(plat):
-                if player.gravity > 0: #Для положительной гравитации
-                    # Если шарик летит вниз или стоит
-                    if player.vel_y >= 0:
-                        # Проверяем, была ли нижняя точка шара выше платформы в прошлом кадре
-                        if (player_rect.bottom - player.vel_y) <= plat.top + 5:
-                            player.y = plat.top - player.size  # Ставим строго на крышу
-                            player.vel_y = 0
-                            player.is_jumping = False
-                            player.can_jump = True
-                            player.on_platform = True
-                            
-                            # Если пробел зажат И мы были в воздухе И не только что приземлились
-                            if space_held and player.was_in_air and not player.just_landed:
-                                player.jump()
-                                player.just_landed = True
-                            
-                            player.was_in_air = False
-                            
-                            # Обновляем хитбокс игрока под новую безопасную координату Y
-                            player_rect.y = player.y
-                if player.gravity < 0: #Для отрицательной гравитации
-                    # Если шарик летит вверх или стоит
-                    if player.vel_y <= 0:
-                        # Проверяем, была ли нижняя точка шара выше платформы в прошлом кадре
-                        if (player_rect.top - player.vel_y) >= plat.bottom - 5:
-                            player.y = plat.bottom   # Ставим строго на крышу
-                            player.vel_y = 0
-                            player.is_jumping = False
-                            player.can_jump = True
-                            player.on_platform = True
-                            
-                            # Если пробел зажат И мы были в воздухе И не только что приземлились
-                            if space_held and player.was_in_air and not player.just_landed:
-                                player.jump()
-                                player.just_landed = True
-                            
-                            player.was_in_air = False
-                            
-                            # Обновляем хитбокс игрока под новую безопасную координату Y
-                            player_rect.y = player.y
+            # расширяем зону обнаружения платформы вверх на 8px —
+            # ровно чтобы перекрыть зазор между хитбоксом и спрайтом,
+            # иначе pygame не считает касание столкновением
+            landing_zone = pygame.Rect(plat.x, plat.y - 8, plat.width, plat.height + 8)
+            if player_rect.colliderect(landing_zone):
+                # Если шарик летит вниз или стоит
+                if player.vel_y >= 0:
+                    # Проверяем, была ли нижняя точка шара выше платформы в прошлом кадре
+                    if (player_rect.bottom - player.vel_y) <= plat.top + 5:
+                        player.y = plat.top - player.size  # Ставим строго на крышу
+                        player.vel_y = 0
+                        player.is_jumping = False
+                        player.can_jump = True
+                        player.on_platform = True
+                        
+                        # Если пробел зажат И мы были в воздухе И не только что приземлились
+                        if space_held and player.was_in_air and not player.just_landed:
+                            player.jump()
+                            player.just_landed = True
+                        
+                        player.was_in_air = False
+                        
+                        # Обновляем хитбокс игрока под новую безопасную координату Y
+                        player_rect.y = player.y
+
         # 4. Проверка на удар боком (Смерть от стены)
         # Проверяем ТОЛЬКО те блоки, на которых мы сейчас НЕ стоим
         for plat in self.platforms:

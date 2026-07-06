@@ -153,11 +153,9 @@ while running:
                 player.gravity *= -1
                 player.jump_strength *= -1
                 player.used_orb = True
-                if player.has_double_jump:
-                    player.can_jump = True
-                    player.has_double_jump = False
+                player.jump_strength /= 10
                 player.jump()
-                
+                player.jump_strength *= 10
         # Проверка победы (достижение финиша)
         if level.world_offset >= FINISH_LINE:
             game_state = "victory"

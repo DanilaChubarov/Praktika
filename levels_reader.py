@@ -1,6 +1,7 @@
 import pygame
 from settings import SCREEN_WIDTH, RED
 
+
 class LevelReader:
     def __init__(self, lvl, floor_y):
         self.floor_y = floor_y
@@ -101,7 +102,6 @@ class LevelReader:
         # Орбы гравитации
         for orb in self.gr_orbs:
             if player_rect.colliderect(orb):
-                player.has_double_jump = True
                 player.can_jump = True
                 if player.used_orb:
                     self.gr_orbs.remove(orb)

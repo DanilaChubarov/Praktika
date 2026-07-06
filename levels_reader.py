@@ -1,6 +1,7 @@
 import pygame
 from settings import SCREEN_WIDTH, RED
 
+
 class LevelReader:
     def __init__(self, lvl, floor_y):
         self.floor_y = floor_y
@@ -92,17 +93,17 @@ class LevelReader:
                 return "DEATH"
         for orb in self.dj_orbs:
             if player_rect.colliderect(orb):
-                self.dj_orbs.remove(orb)
-                player.has_double_jump = True
-                player.can_jump = True
-                return "DBL_JMP"
+                if space_held:
+                    self.dj_orbs.remove(orb)  # Удаляем сферу мгновенно
+                    player.can_jump = True    # Разрешаем прыжок
+                return "DBL_JMP"          # Возвращаем флаг для совершения прыжка
         for orb in self.gr_orbs:
             if player_rect.colliderect(orb):
-                player.has_double_jump = True
                 player.can_jump = True
                 if player.used_orb:
                     self.gr_orbs.remove(orb)
                     player.used_orb = False
+                    player.can_jump = False
                 return "GRAVITY_CHANGE"    
         # 3. Физика платформ (Приземление сверху)
         player.on_platform = False  
@@ -111,28 +112,47 @@ class LevelReader:
             # расширяем зону обнаружения платформы вверх на 8px —
             # ровно чтобы перекрыть зазор между хитбоксом и спрайтом,
             # иначе pygame не считает касание столкновением
-            landing_zone = pygame.Rect(plat.x, plat.y - 8, plat.width, plat.height + 8)
+            landing_zone = pygame.Rect(plat.x, plat.y - 8, plat.width, plat.height + 16)
             if player_rect.colliderect(landing_zone):
-                # Если шарик летит вниз или стоит
-                if player.vel_y >= 0:
-                    # Проверяем, была ли нижняя точка шара выше платформы в прошлом кадре
-                    if (player_rect.bottom - player.vel_y) <= plat.top + 5:
-                        player.y = plat.top - player.size  # Ставим строго на крышу
-                        player.vel_y = 0
-                        player.is_jumping = False
-                        player.can_jump = True
-                        player.on_platform = True
-                        
-                        # Если пробел зажат И мы были в воздухе И не только что приземлились
-                        if space_held and player.was_in_air and not player.just_landed:
-                            player.jump()
-                            player.just_landed = True
-                        
-                        player.was_in_air = False
-                        
-                        # Обновляем хитбокс игрока под новую безопасную координату Y
-                        player_rect.y = player.y
-
+                if player.gravity > 0:
+                    if player.vel_y >= 0:
+                        # Проверяем, была ли нижняя точка шара выше платформы в прошлом кадре
+                        if (player_rect.bottom - player.vel_y) <= plat.top + 5:
+                            player.y = plat.top - player.size  # Ставим строго на крышу
+                            player.vel_y = 0
+                            player.is_jumping = False
+                            player.can_jump = True
+                            player.on_platform = True
+                            
+                            # Если пробел зажат И мы были в воздухе И не только что приземлились
+                            if space_held and player.was_in_air and not player.just_landed:
+                                player.jump()
+                                player.just_landed = True
+                            
+                            player.was_in_air = False
+                            
+                            # Обновляем хитбокс игрока под новую безопасную координату Y
+                            player_rect.y = player.y
+                if player.gravity < 0: #Для отрицательной гравитации
+                    # Если шарик летит вверх или стоит
+                    if player.vel_y <= 0:
+                        # Проверяем, была ли нижняя точка шара выше платформы в прошлом кадре
+                        if (player_rect.top - player.vel_y) >= plat.bottom - 5:
+                            player.y = plat.bottom   # Ставим строго на крышу
+                            player.vel_y = 0
+                            player.is_jumping = False
+                            player.can_jump = True
+                            player.on_platform = True
+                            
+                            # Если пробел зажат И мы были в воздухе И не только что приземлились
+                            if space_held and player.was_in_air and not player.just_landed:
+                                player.jump()
+                                player.just_landed = True
+                            
+                            player.was_in_air = False
+                            
+                            # Обновляем хитбокс игрока под новую безопасную координату Y
+                            player_rect.y = player.y
         # 4. Проверка на удар боком (Смерть от стены)
         # Проверяем ТОЛЬКО те блоки, на которых мы сейчас НЕ стоим
         for plat in self.platforms:

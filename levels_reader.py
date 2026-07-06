@@ -4,42 +4,58 @@ from objects import Object, DoubleJumpOrb, GravityChangeOrb, Platform, Slab
 
 class LevelReader:
     def __init__(self, lvl, floor_y):
+        self.lvl = lvl
         self.floor_y = floor_y
         self.score = 0
-        self.world_offset = 0 
+        self.world_offset = 0
         self.game_speed = lvl.lvl_speed
-        self.obstacles = [] 
-        self.ceil_obstacles = [] 
-        self.platforms = [] 
-        self.slabs = [] 
-        self.dj_orbs = [] 
-        self.gr_orbs = [] 
-        
-        self.bg_image = pygame.transform.scale(lvl.bg_image, (SCREEN_WIDTH, self.floor_y + 50))
+        self.obstacles = []
+        self.ceil_obstacles = []
+        self.platforms = []
+        self.slabs = []
+        self.dj_orbs = []
+        self.gr_orbs = []
+
+        self.bg_image = pygame.transform.scale(
+            lvl.bg_image, (SCREEN_WIDTH, self.floor_y + 50)
+        )
         self.bg_x1 = lvl.bg_x1
         self.bg_x2 = lvl.bg_x2
         self.bg_speed = lvl.bg_speed
+        # Загружаем музыку
+        try:
+            pygame.mixer.music.load(lvl.music_name)
+        except:
+            pass
+
         
-        pygame.mixer.music.load(lvl.music_name)
+
         
         START_OFFSET = 0 
+
         for row_index, row in enumerate(lvl.map):
             for col_index, char in enumerate(row):
                 x = START_OFFSET + (col_index * BLOCK_SIZE)
                 y = row_index * BLOCK_SIZE
-                
+
                 if char == "P":
                     self.platforms.append(Platform(x,y))
                 elif char == "X":
                     self.obstacles.append(pygame.Rect(x, y, BLOCK_SIZE, BLOCK_SIZE))
                 elif char == "M":
-                    self.ceil_obstacles.append(pygame.Rect(x, y, BLOCK_SIZE, BLOCK_SIZE))
+                    self.ceil_obstacles.append(
+                        pygame.Rect(x, y, BLOCK_SIZE, BLOCK_SIZE)
+                    )
                 elif char == "S":
                     self.slabs.append(Slab(x,y))
                 elif char == "D":
+
+                  
+
                     self.dj_orbs.append(DoubleJumpOrb(x, y))
                 elif char == "G":
                     self.gr_orbs.append(GravityChangeOrb(x, y))
+
 
     def update(self):
         # Движение фона
@@ -49,16 +65,21 @@ class LevelReader:
             self.bg_x1 = self.bg_x2 + SCREEN_WIDTH
         if self.bg_x2 <= -SCREEN_WIDTH:
             self.bg_x2 = self.bg_x1 + SCREEN_WIDTH
-        
+
         self.world_offset += self.game_speed
+
+
         self.score += self.game_speed 
         
         # Сдвиг объектов и очистка
         for spike in self.obstacles: spike.x -= self.game_speed
+
         self.obstacles = [s for s in self.obstacles if s.right > 0]
 
-        for c_spike in self.ceil_obstacles: c_spike.x -= self.game_speed
+        for c_spike in self.ceil_obstacles:
+            c_spike.x -= self.game_speed
         self.ceil_obstacles = [s for s in self.ceil_obstacles if s.right > 0]
+
 
         for plat in self.platforms: plat.rect.x -= self.game_speed
         self.platforms = [p for p in self.platforms if p.rect.right > 0]
@@ -72,6 +93,7 @@ class LevelReader:
 
         for orb in self.gr_orbs: orb.rect.x -= self.game_speed
         self.gr_orbs = [orb for orb in self.gr_orbs if orb.rect.right > 0]
+
 
     def check_collisions(self, player_rect, player, space_held=False):
         # Переносим сброс флага платформы на самый верх кадра
@@ -95,6 +117,9 @@ class LevelReader:
                 return orb
 
         for orb in self.gr_orbs:
+
+         
+                  
             if player_rect.colliderect(orb.rect):
                 return orb
 
@@ -160,24 +185,39 @@ class LevelReader:
                         
         return None
 
+
     def draw(self, screen):
         screen.blit(self.bg_image, (self.bg_x1, 0))
         screen.blit(self.bg_image, (self.bg_x2, 0))
-        pygame.draw.line(screen, (255, 255, 255), (0, self.floor_y), (SCREEN_WIDTH, self.floor_y), 2)
-        
+        pygame.draw.line(
+            screen, (255, 255, 255), (0, self.floor_y), (SCREEN_WIDTH, self.floor_y), 2
+        )
+
         for plat in self.platforms:
+
+
+
             plat.draw(screen)
         
+
         for slab in self.slabs:
             pygame.draw.rect(screen, (140, 20, 140), slab)
             pygame.draw.rect(screen, (0, 255, 255), slab, 1)
-        
+
         for spike in self.obstacles:
-            points = [(spike.left, spike.bottom), (spike.centerx, spike.top), (spike.right, spike.bottom)]
+            points = [
+                (spike.left, spike.bottom),
+                (spike.centerx, spike.top),
+                (spike.right, spike.bottom),
+            ]
             pygame.draw.polygon(screen, RED, points)
-        
+
         for c_spike in self.ceil_obstacles:
-            points = [(c_spike.left, c_spike.top), (c_spike.centerx, c_spike.bottom), (c_spike.right, c_spike.top)]
+            points = [
+                (c_spike.left, c_spike.top),
+                (c_spike.centerx, c_spike.bottom),
+                (c_spike.right, c_spike.top),
+            ]
             pygame.draw.polygon(screen, RED, points)
 
         for orb in self.dj_orbs:
@@ -186,4 +226,7 @@ class LevelReader:
              orb.draw(screen)
 
     def play_music(self):
-        pygame.mixer.music.play(-1)
+        try:
+            pygame.mixer.music.play(-1)
+        except:
+            pass

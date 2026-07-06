@@ -93,7 +93,11 @@ class LevelReader:
         player.on_platform = False  
         
         for plat in self.platforms + self.slabs:
-            if player_rect.colliderect(plat):
+            # расширяем зону обнаружения платформы вверх на 8px —
+            # ровно чтобы перекрыть зазор между хитбоксом и спрайтом,
+            # иначе pygame не считает касание столкновением
+            landing_zone = pygame.Rect(plat.x, plat.y - 8, plat.width, plat.height + 8)
+            if player_rect.colliderect(landing_zone):
                 # Если шарик летит вниз или стоит
                 if player.vel_y >= 0:
                     # Проверяем, была ли нижняя точка шара выше платформы в прошлом кадре

@@ -1,12 +1,48 @@
 import pygame
 from levels_reader import BLOCK_SIZE
 class Object:
-    def update_list(obj, list, game_speed):
-        obj.x -= game_speed
-        list = [obj for obj in list if obj.right > 0]
+    def __init__(self, x, y, width, height):
+        self.size = BLOCK_SIZE 
+        self.rect = pygame.Rect(x, y, width, height)
+        self.x = self.rect.x
+        self.y = self.rect.y
+        self.right = self.x + width
+    def update_list(self, list, game_speed):
+        self.x -= game_speed
+        list = [self for self in list if self.right > 0]
         return list
+
 class DoubleJumpOrb(Object):
     def __init__(self, x, y):
-        self.rect = pygame.Rect(x, y, BLOCK_SIZE, BLOCK_SIZE)
-
+        super().__init__(x, y, width=BLOCK_SIZE+5, height=BLOCK_SIZE+5)
+        self.type = "DBL_JMP"
+        self.texture = pygame.image.load("media/textures/double_jump.png").convert_alpha()
+        self.texture = pygame.transform.scale(self.texture, (BLOCK_SIZE, BLOCK_SIZE))
+    def draw(self, screen):
+        screen.blit(self.texture, (self.rect.x, self.rect.y))
+class GravityChangeOrb(Object):
+    def __init__(self, x, y):
+        super().__init__(x, y, width=BLOCK_SIZE+5, height=BLOCK_SIZE+5)
+        self.type = "GRAVITY_CHANGE"
+        self.texture = pygame.image.load("media/textures/gravity_orb.png").convert_alpha()
+        self.texture = pygame.transform.scale(self.texture, (BLOCK_SIZE, BLOCK_SIZE))
+    def draw(self, screen):
+        screen.blit(self.texture, (self.rect.x, self.rect.y))
+class Platform:
+     def __init__(self, x, y):
+        super().__init__(x, y, width=BLOCK_SIZE, height=BLOCK_SIZE)
+        self.type = "DEATH"
+class Slab:
+     def __init__(self, x, y):
+        super().__init__(x, y, width=BLOCK_SIZE, height=BLOCK_SIZE//2)
+        self.type = "DEATH"
+class Spike:
+     def __init__(self, x, y):
+        super().__init__(x, y, width=BLOCK_SIZE, height=BLOCK_SIZE)
+        self.type = "DEATH"
+class CeilingSpike:
+    def __init__(self, x, y):
+        super().__init__(x, y, width=BLOCK_SIZE, height=BLOCK_SIZE)
+        self.type = "DEATH"
+    
     

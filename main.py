@@ -11,9 +11,9 @@ from player import Player
 from levels_reader import LevelReader
 
 # Импортируем уровни из новых файлов (по нашей новой структуре)
-from level1 import LevelOne
-from level2 import LevelTwo
-from level3 import LevelThree
+from levels.level1 import LevelOne
+from levels.level2 import LevelTwo
+from levels.level3 import LevelThree
 
 # Инициализация Pygame
 pygame.init()

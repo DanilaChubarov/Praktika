@@ -4,41 +4,20 @@ from settings import SCREEN_HEIGHT, SCREEN_WIDTH
 
 class LevelOne:
     def __init__(self):
-        self.map = [
-            "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",  # Потолок
-            "   M        M          M                 M       MMMMM             ",  # Шипы на потолке
-            "                                                                   ",
-            "                                                                   ",
-            "                     PPPPPP          PPPPPP                        ",  # Верхний ярус платформ
-            "                       XX              XX                          ",  # Шипы НА платформах
-            "                                                                   ",
-            "               PPPP                                                ",  # Нижний ярус платформ
-            "                XX                                                 ",
-            "          PPP                                                      ",
-            "    PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP   ",  # Шипы на основном полу
-        ]
-        # ===== ФОН С ДВИЖЕНИЕМ =====
-        self.bg_image = pygame.image.load("41524.jpg").convert()
+        self.map = []
+        #Писать карту надо без пробела в конце и лиших символов, кодировка UTF-8
+        with open("media/maps/level1_map.txt", "r", encoding="utf-8") as file:
+            for line in file:
+                self.map.append(line.strip('\n'))
+        
+        self.bg_image = pygame.image.load("media/background/level1_bg.jpg").convert()
         self.bg_image = pygame.transform.scale(
             self.bg_image, (SCREEN_WIDTH, SCREEN_HEIGHT)
         )
+        self.lvl_speed = 7
         self.bg_x1 = 0
         self.bg_x2 = SCREEN_WIDTH
-        self.game_speed = 7  # Скорость движения фона
-
-    def update(self):
-        self.bg_x1 -= self.game_speed
-        self.bg_x2 -= self.game_speed
-
-        # Зацикливание фона
-        if self.bg_x1 <= -SCREEN_WIDTH:
-            self.bg_x1 = self.bg_x2 + SCREEN_WIDTH
-        if self.bg_x2 <= -SCREEN_WIDTH:
-            self.bg_x2 = self.bg_x1 + SCREEN_WIDTH
-
-    def draw_background(self, screen):
-        screen.blit(self.bg_image, (self.bg_x1, 0))
-        screen.blit(self.bg_image, (self.bg_x2, 0))
-
+        self.bg_speed = 3  # Скорость движения фона
+        self.music_name = "media/music/level1_music.mp3"
     def getMap(self):
         return self.map

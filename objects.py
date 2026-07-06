@@ -28,11 +28,15 @@ class GravityChangeOrb(Object):
         self.texture = pygame.transform.scale(self.texture, (BLOCK_SIZE, BLOCK_SIZE))
     def draw(self, screen):
         screen.blit(self.texture, (self.rect.x, self.rect.y))
-class Platform:
+class Platform(Object):
      def __init__(self, x, y):
         super().__init__(x, y, width=BLOCK_SIZE, height=BLOCK_SIZE)
         self.type = "DEATH"
-class Slab:
+     def draw(self, screen):
+            pygame.draw.rect(screen, (140, 20, 140), self.rect)
+            pygame.draw.rect(screen, (0, 255, 255), self.rect, 1)
+        
+class Slab(Object):
      def __init__(self, x, y):
         super().__init__(x, y, width=BLOCK_SIZE, height=BLOCK_SIZE//2)
         self.type = "DEATH"

@@ -135,9 +135,10 @@ while running:
                 just_pressed = True
                 player.jump()
         
-        # Физика и обновление
-        player.update(space_held=space_pressed)
+        # Физика и обновление 
         level.update()
+        player.update(space_held=space_pressed)
+        
         
         # ИСПРАВЛЕНО: Вызываем проверку один раз и сохраняем результат в переменную
         player_rect = player.get_rect()
@@ -166,12 +167,13 @@ while running:
                     player.gravity *= -1
                     player.jump_strength *= -1
                     player.jump()
+                                            
         # Проверка победы (достижение финиша)
         if level.world_offset >= FINISH_LINE:
             game_state = "victory"
             pygame.mixer.music.stop()
         
-        # Отрисовка игры
+        # Отрисовка игры          
         level.draw(screen)
         player.draw(screen)
         

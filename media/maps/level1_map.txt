@@ -1,11 +1,11 @@
-PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP
+
      
-                       G                                                                                                                                                                                       PPPPPP      PPP                                 PPPPPPPPPPPPPPPPPPPPPP
+                                                                                                                                                                                                              PPPPPP      PPP                                 PPPPPPPPPPPPPPPPPPPPPP
                                                                                                                                                                                                               PPMMMMPPP    MMM
                                                                                                                                                                                                                M    M
                                                                                                                                                                                                                   D                                   D
                                                                                                                                                      SSSSSS                                                                 D                                   G
                                                                                                                                                  S                                                       XX       X         XX                    D            XXXX
-                                                                                                                                    X           XXXXXXXXXXXX    X                                   SSSSSSSSSSSSSSSS    SSSSSSSS                  XXXXXXXXXPPPPPPPPPP
-            G     D                                      P                                                                  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPSSSSSS                              D                    D                  PPPPPPPPPPPPPPPPPPPPPPPPP
+                                                                                                                                 X           XXXXXXXXXXXX    X                                   SSSSSSSSSSSSSSSS    SSSSSSSS                  XXXXXXXXXPPPPPPPPPP
+                 PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP     P                                                                  PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPSSSSSS                              D                    D                  PPPPPPPPPPPPPPPPPPPPPPPPP
                             X               X        P   P        X                         X               XX              PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP          X        XX   XX         XXXXXX              XXXXXXXX    PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP

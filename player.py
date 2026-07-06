@@ -50,9 +50,19 @@ class Player:
             
             self.was_in_air = False
         else:
-
+            # Мы в воздухе
             self.was_in_air = True
             self.just_landed = False
+            
+        if self.gravity < 0 and self.y <= 0:
+            self.y = 0
+            self.vel_y = 0
+            self.is_jumping = False
+            self.can_jump = True
+            
+            # Автопрыжок от потолка
+            if space_held:
+                self.jump()
 
         # Вращение
         if self.gravity > 0:

@@ -74,4 +74,4 @@ class Player:
         screen.blit(rotated_ball, rect.topleft)
 
     def get_rect(self):
-        return pygame.Rect(self.x + 6 , self.y+6, self.size-12, self.size-12)
+        return pygame.Rect(self.x + 3 , self.y+3, self.size-12, self.size-12)

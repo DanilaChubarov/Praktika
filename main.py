@@ -9,7 +9,11 @@ from settings import (
 )
 from player import Player
 from levels_reader import LevelReader
+
+# Импортируем уровни из новых файлов (по нашей новой структуре)
 from level1 import LevelOne
+from level2 import LevelTwo
+from level3 import LevelThree
 
 # Инициализация Pygame
 pygame.init()
@@ -22,64 +26,62 @@ clock = pygame.time.Clock()
 
 # Переменные мира
 floor_y = SCREEN_HEIGHT - 60
-FINISH_LINE = 30000  # Координата финиша (увеличил)
+FINISH_LINE = 30000  # Координата финиша
 
 def draw_menu():
-    """Отрисовка меню"""
     screen.fill(BLACK)
-    font_title = pygame.font.SysFont(None, 72)
-    font_text = pygame.font.SysFont(None, 36)
-    
-    title = font_title.render("GEOMETRY DASH", True, WHITE)
-    start_text = font_text.render("SPACE - Начать / Перезапустить", True, WHITE)
-    hint = font_text.render("Зажимай SPACE чтобы прыгать непрерывно!", True, WHITE)
-    
-    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 100))
-    screen.blit(start_text, (SCREEN_WIDTH // 2 - start_text.get_width() // 2, 250))
-    screen.blit(hint, (SCREEN_WIDTH // 2 - hint.get_width() // 2, 320))
-    
+    title = pygame.font.SysFont(None, 72).render("GEOMETRY DASH", True, WHITE)
+    f = pygame.font.SysFont(None, 40)
+
+    t1 = f.render("1 - Level 1 (Easy)", True, WHITE)
+    t2 = f.render("2 - Level 2 (Medium)", True, WHITE)
+    t3 = f.render("3 - Level 3 (Hard)", True, WHITE)
+    t4 = f.render("ESC - Exit", True, WHITE)
+
+    screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 80))
+    screen.blit(t1, (340, 200))
+    screen.blit(t2, (340, 250))
+    screen.blit(t3, (340, 300))
+    screen.blit(t4, (340, 380))
     pygame.display.flip()
 
 def draw_game_over(final_score):
-    """Отрисовка экрана проигрыша"""
+    screen.fill(BLACK) # Очищаем экран перед текстом
     font = pygame.font.SysFont(None, 72)
     font_small = pygame.font.SysFont(None, 36)
     
     game_over_text = font.render("GAME OVER!", True, (255, 50, 50))
     score_text = font_small.render(f"Счет: {final_score}", True, WHITE)
-    restart_text = font_small.render("SPACE - Начать заново", True, WHITE)
+    restart_text = font_small.render("SPACE - В главное меню", True, WHITE)
     
     screen.blit(game_over_text, (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, 150))
     screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, 250))
     screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 350))
-    
     pygame.display.flip()
 
 def draw_victory(final_score):
-    """Отрисовка экрана победы"""
+    screen.fill(BLACK) # Очищаем экран перед текстом
     font = pygame.font.SysFont(None, 72)
     font_small = pygame.font.SysFont(None, 36)
     
     victory_text = font.render("ПОБЕДА!", True, (50, 255, 50))
     score_text = font_small.render(f"Финальный счет: {final_score}", True, WHITE)
-    restart_text = font_small.render("SPACE - Играть снова", True, WHITE)
+    restart_text = font_small.render("SPACE - В главное меню", True, WHITE)
     
     screen.blit(victory_text, (SCREEN_WIDTH // 2 - victory_text.get_width() // 2, 150))
     screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, 250))
     screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 350))
-    
     pygame.display.flip()
 
-def reset_game():
-    """Сброс игры"""
-    curr_lvl = LevelOne()
+def reset_game(level_class):
+    curr_lvl = level_class()
     player = Player(curr_lvl, x=100, floor_y=floor_y)
     level = LevelReader(curr_lvl, floor_y=floor_y)
-    
     return player, level, curr_lvl
 
-# Инициализация игры
-player, level, curr_lvl = reset_game()
+# Первоначальная инициализация игры
+selected_level = LevelOne
+player, level, curr_lvl = reset_game(selected_level)
 game_state = "menu"  # "menu", "playing", "game_over", "victory"
 space_pressed = False
 
@@ -93,27 +95,40 @@ while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                game_state = "playing"
-                level.play_music()
-                space_pressed = False
+            
+            # ИСПРАВЛЕНО: Кнопки выбора уровней теперь внутри цикла событий меню!
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_1:
+                    selected_level = LevelOne
+                    player, level, curr_lvl = reset_game(selected_level)
+                    game_state = "playing"
+                    level.play_music()
+                elif event.key == pygame.K_2:
+                    selected_level = LevelTwo
+                    player, level, curr_lvl = reset_game(selected_level)
+                    game_state = "playing"
+                    level.play_music()
+                elif event.key == pygame.K_3:
+                    selected_level = LevelThree
+                    player, level, curr_lvl = reset_game(selected_level)
+                    game_state = "playing"
+                    level.play_music()
+                elif event.key == pygame.K_ESCAPE:
+                    running = False
                 
     elif game_state == "playing":
-        # Обработка событий
+        # Обработка событий игрового процесса
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             
-            # НАЖАТИЕ кнопки Space
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
                 space_pressed = True
                 player.jump()
             
-            # ОТПУСКАНИЕ кнопки Space
             if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
                 space_pressed = False
             
-            # Клик мыши (альтернатива)
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 player.jump()
         
@@ -121,13 +136,19 @@ while running:
         player.update(space_held=space_pressed)
         level.update()
         
-        # Проверка коллизий
+        # ИСПРАВЛЕНО: Вызываем проверку один раз и сохраняем результат в переменную
         player_rect = player.get_rect()
-        if level.check_collisions(player_rect, player, space_held=space_pressed)=="DEATH":
+        collision_result = level.check_collisions(player_rect, player, space_held=space_pressed)
+        
+        if collision_result == "DEATH":
             game_state = "game_over"
-        elif level.check_collisions(player_rect, player, space_held=space_pressed)=="DBL_JMP":
-                player.jump()
-        elif level.check_collisions(player_rect, player, space_held=space_pressed)=="GRAVITY_CHANGE" :
+            pygame.mixer.music.stop() # Останавливаем музыку при смерти
+            
+        elif collision_result == "DBL_JMP" and player.has_double_jump:
+            player.can_jump = True
+            player.has_double_jump = False
+            
+        elif collision_result == "GRAVITY_CHANGE":
             if space_pressed:
                 player.gravity *= -1
                 player.jump_strength *= -1
@@ -138,12 +159,13 @@ while running:
         # Проверка победы (достижение финиша)
         if level.world_offset >= FINISH_LINE:
             game_state = "victory"
+            pygame.mixer.music.stop()
         
         # Отрисовка игры
         level.draw(screen)
         player.draw(screen)
         
-        # Отображение UI
+        # Отображение UI (Счет)
         font = pygame.font.SysFont(None, 36)
         score_text = font.render(f"Счет: {level.score}", True, WHITE)
         screen.blit(score_text, (10, 10))
@@ -156,7 +178,8 @@ while running:
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                player, level, lvl = reset_game()
+                # ИСПРАВЛЕНО: Теперь сбрасывается корректно с передачей выбранного уровня
+                player, level, curr_lvl = reset_game(selected_level)
                 game_state = "menu"
                 space_pressed = False
                 
@@ -166,7 +189,8 @@ while running:
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                player, level, lvl = reset_game()
+                # ИСПРАВЛЕНО: Сброс для экрана победы
+                player, level, curr_lvl = reset_game(selected_level)
                 game_state = "menu"
                 space_pressed = False
 

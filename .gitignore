@@ -83,4 +83,6 @@ env/
 .uic/
 /build*/
 /.qtcreator/
+env/
+import_pygame.py
 all_py_files_combined.txt

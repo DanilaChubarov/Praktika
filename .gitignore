@@ -75,6 +75,7 @@ CMakeLists.txt.user*
 *.exe
 
 # Directories with generated files
+env/
 .moc/
 .obj/
 .pch/
@@ -82,4 +83,6 @@ CMakeLists.txt.user*
 .uic/
 /build*/
 /.qtcreator/
+env/
+import_pygame.py
 all_py_files_combined.txt

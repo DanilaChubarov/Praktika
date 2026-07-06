@@ -14,7 +14,6 @@ class Player:
         self.jump_strength = -14
         self.is_jumping = False
         self.can_jump = True
-        self.has_double_jump = False
         self.angle = 0
         self.on_platform = False
         self.was_in_air = False  # Флаг для отслеживания приземления
@@ -51,15 +50,22 @@ class Player:
             
             self.was_in_air = False
         else:
-            # Мы в воздухе
+
             self.was_in_air = True
             self.just_landed = False
 
         # Вращение
-        if not self.is_jumping:
-            self.angle -= self.game_speed * 1.5
-        else:
-            self.angle -= 5
+        if self.gravity > 0:
+            if not self.is_jumping:
+                self.angle -= self.game_speed * 1.5
+            else:
+                self.angle -= 5
+        if self.gravity < 0:
+            if not self.is_jumping:
+                self.angle += self.game_speed * 1.5
+            else:
+                self.angle += 5
+            
 
     def draw(self, screen):
         rotated_ball = pygame.transform.rotate(self.texture, self.angle)

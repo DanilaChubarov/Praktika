@@ -16,6 +16,7 @@ from levels.level2 import LevelTwo
 from levels.level3 import LevelThree
 
 # Инициализация Pygame
+pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=2048)
 pygame.init()
 pygame.mixer.init()
 
@@ -38,6 +39,8 @@ btn_height = 180
 spacing = 70
 total_width = btn_width * 3 + spacing * 2
 start_x = (SCREEN_WIDTH - total_width) // 2 - 30
+
+game_over_timer = 0
 
 # Кнопки уровней (прямоугольники)
 LEVEL1_BTN = pygame.Rect(start_x, 160, btn_width, btn_height)
@@ -150,10 +153,21 @@ def draw_victory(final_score):
 
 
 def reset_game(level_class):
-    """Сброс игры для выбранного уровня"""
+    try:
+        pygame.mixer.quit()
+        pygame.mixer.init()
+    except:
+        pass
+
     curr_lvl = level_class()
     player = Player(curr_lvl, x=100, floor_y=floor_y)
     level = LevelReader(curr_lvl, floor_y=floor_y)
+
+    try:
+        level.play_music()
+    except:
+        pass
+
     return player, level, curr_lvl
 
 
@@ -201,14 +215,23 @@ while running:
                 running = False
 
     elif game_state == "playing":
-        # Обработка событий игрового процесса
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                space_pressed = True
-                player.jump()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    player, level, curr_lvl = reset_game(selected_level)
+                    game_state = "menu"
+                    space_pressed = False
+                    try:
+                        pygame.mixer.music.stop()
+                    except:
+                        pass
+
+                if event.key == pygame.K_SPACE:
+                    space_pressed = True
+                    player.jump()
 
             if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
                 space_pressed = False
@@ -216,7 +239,7 @@ while running:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 player.jump()
 
-        # Физика и обновление
+            # Физика и обновление
         player.update(space_held=space_pressed)
         level.update()
 
@@ -250,7 +273,7 @@ while running:
             except:
                 pass
 
-        # Отрисовка
+            # Отрисовка
         level.draw(screen)
         player.draw(screen)
 
@@ -258,28 +281,73 @@ while running:
         font = pygame.font.SysFont(None, 36)
         score_text = font.render(f"Счет: {level.score}", True, WHITE)
         screen.blit(score_text, (10, 10))
-
         pygame.display.flip()
 
     elif game_state == "game_over":
         draw_game_over(level.score)
+        try:
+            pygame.mixer.music.stop()
+        except:
+            pass
+        # перезапуск через 2 секунды
+        game_over_timer += 1
+        if game_over_timer >= FPS * 2:
+            player, level, curr_lvl = reset_game(selected_level)
+            game_state = "playing"
+            game_over_timer = 0
+            space_pressed = False
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                player, level, curr_lvl = reset_game(selected_level)
-                game_state = "menu"
-                space_pressed = False
+
+            if event.type == pygame.KEYDOWN:
+                # ESC → возврат в меню
+                if event.key == pygame.K_ESCAPE:
+                    player, level, curr_lvl = reset_game(selected_level)
+                    game_state = "menu"
+                    game_over_timer = 0
+                    space_pressed = False
+                    try:
+                        pygame.mixer.music.stop()
+                    except:
+                        pass
+
+                # SPACE → мгновенный рестарт
+                if event.key == pygame.K_SPACE:
+                    player, level, curr_lvl = reset_game(selected_level)
+                    game_state = "playing"
+                    game_over_timer = 0
+                    space_pressed = False
 
     elif game_state == "victory":
         draw_victory(level.score)
+
+        try:
+            pygame.mixer.music.stop()
+        except:
+            pass
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                player, level, curr_lvl = reset_game(selected_level)
-                game_state = "menu"
-                space_pressed = False
+
+            if event.type == pygame.KEYDOWN:
+                # ESC → возврат в меню
+                if event.key == pygame.K_ESCAPE:
+                    player, level, curr_lvl = reset_game(selected_level)
+                    game_state = "menu"
+                    space_pressed = False
+                    try:
+                        pygame.mixer.music.stop()
+                    except:
+                        pass
+
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                    # Перезапустить уровень заново
+                    player, level, curr_lvl = reset_game(selected_level)
+                    game_state = "playing"
+                    space_pressed = False
 
 pygame.quit()
 sys.exit()

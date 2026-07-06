@@ -215,10 +215,16 @@ while running:
                 running = False
 
     elif game_state == "playing":
+        just_pressed = False
+        # Обработка событий игрового процесса
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
+                space_pressed = True
+                just_pressed = True
+                player.jump()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     player, level, curr_lvl = reset_game(selected_level)
@@ -237,37 +243,48 @@ while running:
                 space_pressed = False
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                just_pressed = True
                 player.jump()
 
-            # Физика и обновление
-        player.update(space_held=space_pressed)
+        # Физика и обновление
         level.update()
 
+        # Физика и обновление
+        player.update(space_held=space_pressed)
+
+        # ИСПРАВЛЕНО: Вызываем проверку один раз и сохраняем результат в переменную
         player_rect = player.get_rect()
-        collision_result = level.check_collisions(
-            player_rect, player, space_held=space_pressed
-        )
+        hit_object = level.check_collisions(player_rect, player)
 
-        if collision_result == "DEATH":
-            game_state = "game_over"
-            try:
-                pygame.mixer.music.stop()
-            except:
-                pass
+        if hit_object is not None:  # Игрок столкнулся с каким-то орбом
+            if hit_object.type == "DEATH":
+                game_state = "game_over"
+                pygame.mixer.music.stop()  # Останавливаем музыку при смерти
 
-        elif collision_result == "DBL_JMP" and player.has_double_jump:
-            player.can_jump = True
-            player.has_double_jump = False
+            if hit_object.type == "DEATH":
+                game_state = "game_over"
+            if just_pressed:  # Игрок нажал прыжок именно в этот кадр
 
-        elif collision_result == "GRAVITY_CHANGE":
-            if space_pressed:
-                player.gravity *= -1
-                player.jump_strength *= -1
-                player.used_orb = True
+                # Проверяем ТИП орба и выполняем нужное действие
+                if hit_object.type == "DBL_JMP":
+                    level.dj_orbs.remove(hit_object)
+                    player.vel_y = 0  # Удаляем из списка желтых
+                    player.can_jump = True
+                    player.jump()
+                    just_pressed = False
 
-        # Проверка победы
+                elif hit_object.type == "GRAVITY_CHANGE":
+                    level.gr_orbs.remove(hit_object)  # ...или из списка розовых
+                    player.gravity *= -1
+                    player.jump_strength *= -1
+                    player.jump()
+
+        # Проверка победы (достижение финиша)
         if level.world_offset >= FINISH_LINE:
             game_state = "victory"
+            pygame.mixer.music.stop()
+
+            # Отрисовка игры
             try:
                 pygame.mixer.music.stop()
             except:

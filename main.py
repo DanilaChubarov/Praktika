@@ -215,16 +215,14 @@ while running:
                 running = False
 
     elif game_state == "playing":
+
         just_pressed = False
         # Обработка событий игрового процесса
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
 
-            if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                space_pressed = True
-                just_pressed = True
-                player.jump()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     player, level, curr_lvl = reset_game(selected_level)
@@ -237,6 +235,7 @@ while running:
 
                 if event.key == pygame.K_SPACE:
                     space_pressed = True
+                    just_pressed = True
                     player.jump()
 
             if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
@@ -246,11 +245,9 @@ while running:
                 just_pressed = True
                 player.jump()
 
-        # Физика и обновление
-        level.update()
-
-        # Физика и обновление
+            # Физика и обновление
         player.update(space_held=space_pressed)
+        level.update()
 
         # ИСПРАВЛЕНО: Вызываем проверку один раз и сохраняем результат в переменную
         player_rect = player.get_rect()
@@ -282,15 +279,13 @@ while running:
         # Проверка победы (достижение финиша)
         if level.world_offset >= FINISH_LINE:
             game_state = "victory"
-            pygame.mixer.music.stop()
-
-            # Отрисовка игры
             try:
                 pygame.mixer.music.stop()
             except:
                 pass
 
-            # Отрисовка
+        # Отрисовка игры
+
         level.draw(screen)
         player.draw(screen)
 

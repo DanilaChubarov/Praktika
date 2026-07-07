@@ -139,6 +139,9 @@ class LevelReader:
 
         # 3. ПРИЗЕМЛЕНИЕ НА ПЛАТФОРМЫ И ПОЛУБЛОКИ
         if player.gravity > 0:
+            
+            player.on_platform = False
+            
             for plat in self.platforms + self.slabs:
                 p_rect = plat.rect
                 landing_zone = pygame.Rect(
@@ -159,7 +162,12 @@ class LevelReader:
                                 player.jump()
                                 player_rect.y = player.y
                                 return None
-
+                if player.y >= player.floor_y - player.size:
+                    player.is_jumping = False
+                    player.can_jump = True
+                    player.on_platform = True
+            if not player.on_platform:
+                player.can_jump = False
         elif player.gravity < 0:
             for plat in self.platforms + self.slabs:
                 p_rect = plat.rect

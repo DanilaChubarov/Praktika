@@ -45,6 +45,7 @@ class Player:
             self.vel_y = 0
             self.is_jumping = False
             self.can_jump = True
+            self.on_platform = True
 
             # Если пробел зажат И мы были в воздухе И не только что приземлились
             if space_held and self.was_in_air and not self.just_landed:
@@ -57,6 +58,7 @@ class Player:
             # Мы в воздухе
             self.was_in_air = True
             self.just_landed = False
+            self.on_platform = False
 
         if self.gravity < 0 and self.y <= 0:
             self.y = 0

@@ -81,6 +81,28 @@ class Player:
                 self.angle += self.game_speed * 1.5
             else:
                 self.angle += 5
+    def fly(self, space_held):
+        """Физика полета для режима корабля (SHIP)"""
+        # Константы для настройки физики корабля (можно вынести в settings.py)
+        THRUST = 0.6         # Сила подъема вверх при зажатом пробеле
+        GRAVITY_SHIP = 0.45  # Сила падения вниз (обычно мягче, чем у куба)
+        MAX_SPEED_Y = 6      # Максимальная скорость взлета/падения
+
+        if space_held:
+            # Тяга вверх: уменьшаем vel_y (в Pygame минус — это вверх)
+            self.vel_y -= THRUST
+        else:
+            # Падение: увеличиваем vel_y под действием гравитации корабля
+            self.vel_y += GRAVITY_SHIP
+
+        # Ограничиваем скорость, чтобы корабль управлялся адекватно
+        if self.vel_y > MAX_SPEED_Y:
+            self.vel_y = MAX_SPEED_Y
+        elif self.vel_y < -MAX_SPEED_Y:
+            self.vel_y = -MAX_SPEED_Y
+
+        # Применяем изменение позиции
+        self.y += self.vel_y
 
     def draw(self, screen):
         rotated_ball = pygame.transform.rotate(self.texture, self.angle)

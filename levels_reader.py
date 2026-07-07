@@ -8,7 +8,9 @@ from objects import (
     Slab,
     Spike,
     CeilingSpike,
+    ShipPortal
 )
+from enum import Enum, auto
 
 
 class LevelReader:
@@ -24,6 +26,8 @@ class LevelReader:
         self.slabs = []
         self.dj_orbs = []
         self.gr_orbs = []
+        self.sh_ports = []
+        self.game_mode = GameState.CUBE
 
         self.bg_image = pygame.transform.scale(
             lvl.bg_image, (SCREEN_WIDTH, self.floor_y + 50)
@@ -43,21 +47,8 @@ class LevelReader:
 
         BLOCK_SIZE = 40
         START_OFFSET = 0
-
-        self.dj_orb_texture = pygame.image.load(
-            "media/textures/double_jump.png"
-        ).convert_alpha()
-        self.dj_orb_texture = pygame.transform.scale(
-            self.dj_orb_texture, (BLOCK_SIZE, BLOCK_SIZE)
-        )
-
-        self.gr_orb_texture = pygame.image.load(
-            "media/textures/gravity_orb.png"
-        ).convert_alpha()
-        self.gr_orb_texture = pygame.transform.scale(
-            self.gr_orb_texture, (BLOCK_SIZE, BLOCK_SIZE)
-        )
-
+      
+        
         for row_index, row in enumerate(lvl.map):
             for col_index, char in enumerate(row):
                 x = START_OFFSET + (col_index * BLOCK_SIZE)
@@ -75,6 +66,8 @@ class LevelReader:
                     self.dj_orbs.append(DoubleJumpOrb(x, y))
                 elif char == "G":
                     self.gr_orbs.append(GravityChangeOrb(x, y))
+                elif char == "H":
+                    self.sh_ports.append(ShipPortal(x, y))
 
     def update(self):
         # Движение фона
@@ -112,6 +105,9 @@ class LevelReader:
         for orb in self.gr_orbs:
             orb.rect.x -= self.game_speed
         self.gr_orbs = [orb for orb in self.gr_orbs if orb.rect.right > 0]
+        for port in self.sh_ports:
+            port.rect.x -= self.game_speed
+        self.sh_ports = [port for port in self.sh_ports if port.rect.right > 0]
 
     def check_collisions(self, player_rect, player, space_held=False):
         # ВАЖНО: сбрасываем флаг платформы в начале каждого кадра,
@@ -136,7 +132,11 @@ class LevelReader:
         for orb in self.gr_orbs:
             if player_rect.colliderect(orb.rect):
                 return orb
-
+        for port in self.sh_ports:
+            if player_rect.colliderect(port.rect):
+                print(port.type)
+                return port
+              
         # 3. ПРИЗЕМЛЕНИЕ НА ПЛАТФОРМЫ И ПОЛУБЛОКИ
         if player.gravity > 0:
             
@@ -191,7 +191,7 @@ class LevelReader:
                                 return None
 
         # 4. УДАР БОКОМ В СТЕНУ
-        if not player.on_platform:
+        if not player.on_platform or  (player.y >= player.floor_y - player.size):
             for plat in self.platforms + self.slabs:
                 p_rect = plat.rect
                 if player_rect.colliderect(p_rect):
@@ -229,9 +229,15 @@ class LevelReader:
             orb.draw(screen)
         for orb in self.gr_orbs:
             orb.draw(screen)
+        for port in self.sh_ports:
+            port.draw(screen)
 
     def play_music(self):
         try:
             pygame.mixer.music.play(-1)
         except:
             pass
+class GameState(Enum):
+    CUBE = auto()       
+    SHIP = auto()       
+    WAVE = auto()

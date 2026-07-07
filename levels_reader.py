@@ -209,25 +209,14 @@ class LevelReader:
             plat.draw(screen)
 
         for slab in self.slabs:
-            pygame.draw.rect(screen, (140, 20, 140), slab.rect)
-            pygame.draw.rect(screen, (0, 255, 255), slab.rect, 1)
+            slab.draw(screen)
 
         for spike in self.obstacles:
-            points = [
-                (spike.rect.left, spike.rect.bottom),
-                (spike.rect.centerx, spike.rect.top),
-                (spike.rect.right, spike.rect.bottom),
-            ]
-            pygame.draw.polygon(screen, RED, points)
+            spike.draw(screen)
 
         for c_spike in self.ceil_obstacles:
-            points = [
-                (c_spike.rect.left, c_spike.rect.top),
-                (c_spike.rect.centerx, c_spike.rect.bottom),
-                (c_spike.rect.right, c_spike.rect.top),
-            ]
-            pygame.draw.polygon(screen, RED, points)
-
+           c_spike.draw(screen)
+    
         for orb in self.dj_orbs:
             orb.draw(screen)
         for orb in self.gr_orbs:

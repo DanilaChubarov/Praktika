@@ -1,5 +1,5 @@
 import pygame
-from levels_reader import BLOCK_SIZE
+from levels_reader import BLOCK_SIZE, RED
 
 
 class Object:
@@ -13,7 +13,7 @@ class Object:
 
     def update_list(self, list, game_speed):
         self.x -= game_speed
-        list = [self for self in list if self.right > 0]
+        list = [self for self in list if self.rect.right > 0]
         return list
 
 
@@ -57,15 +57,30 @@ class Slab(Object):
     def __init__(self, x, y):
         super().__init__(x, y, width=BLOCK_SIZE, height=BLOCK_SIZE // 2)
         self.type = "DEATH"
-
+    def draw(self, screen):
+        pygame.draw.rect(screen, (140, 20, 140), self.rect)
+        pygame.draw.rect(screen, (0, 255, 255), self.rect, 1)
 
 class Spike(Object):
     def __init__(self, x, y):
         super().__init__(x, y, width=BLOCK_SIZE, height=BLOCK_SIZE)
         self.type = "DEATH"
-
+    def draw(self, screen):
+        points = [
+                (self.rect.left, self.rect.bottom),
+                (self.rect.centerx, self.rect.top),
+                (self.rect.right, self.rect.bottom),
+            ]
+        pygame.draw.polygon(screen, RED, points)
 
 class CeilingSpike(Object):
     def __init__(self, x, y):
         super().__init__(x, y, width=BLOCK_SIZE, height=BLOCK_SIZE)
         self.type = "DEATH"
+    def draw(self, screen):
+        points = [
+                (self.rect.left, self.rect.top),
+                (self.rect.centerx, self.rect.bottom),
+                (self.rect.right, self.rect.top),
+            ]
+        pygame.draw.polygon(screen, RED, points)

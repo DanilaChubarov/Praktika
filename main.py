@@ -50,6 +50,11 @@ LEVEL3_BTN = pygame.Rect(
 )
 
 
+def get_progress_percent(level):
+    """Считает процент прохождения уровня (0-100)."""
+    return min(100, int(level.world_offset / FINISH_LINE * 100))
+
+
 def draw_menu():
     """Отрисовка меню с тремя кнопками и фоном"""
     # Рисуем фон (как в игре)
@@ -57,7 +62,7 @@ def draw_menu():
 
     # Затемнение фона для читаемости текста
     overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
-    overlay.set_alpha(128)  # полупрозрачный
+    overlay.set_alpha(128)
     overlay.fill((0, 0, 0))
     screen.blit(overlay, (0, 0))
 
@@ -118,21 +123,30 @@ def draw_menu():
     pygame.display.flip()
 
 
-def draw_game_over(final_score):
+def draw_game_over(final_score, level_bg):
     """Отрисовка экрана проигрыша"""
-    screen.fill(BLACK)
+    if level_bg:
+        bg_scaled = pygame.transform.scale(level_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
+        screen.blit(bg_scaled, (0, 0))
+    else:
+        screen.fill(BLACK)
+    overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+    overlay.set_alpha(180)
+    overlay.fill((0, 0, 0))
+    screen.blit(overlay, (0, 0))
+
     font = pygame.font.SysFont(None, 72)
     font_small = pygame.font.SysFont(None, 36)
 
     game_over_text = font.render("GAME OVER!", True, (255, 50, 50))
-    score_text = font_small.render(f"Счет: {final_score}", True, WHITE)
-    restart_text = font_small.render("SPACE - В главное меню", True, WHITE)
+    score_text = font_small.render(f"Прогресс: {final_score}%", True, WHITE)
+    restart_text = font_small.render("ESC - В главное меню", True, WHITE)
 
     screen.blit(
-        game_over_text, (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, 150)
+        game_over_text, (SCREEN_WIDTH // 2 - game_over_text.get_width() // 2, 100)
     )
-    screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, 250))
-    screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 350))
+    screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, 200))
+    screen.blit(restart_text, (SCREEN_WIDTH // 2 - restart_text.get_width() // 2, 300))
     pygame.display.flip()
 
 
@@ -162,11 +176,6 @@ def reset_game(level_class):
     curr_lvl = level_class()
     player = Player(curr_lvl, x=100, floor_y=floor_y)
     level = LevelReader(curr_lvl, floor_y=floor_y)
-
-    try:
-        level.play_music()
-    except:
-        pass
 
     return player, level, curr_lvl
 
@@ -217,6 +226,7 @@ while running:
     elif game_state == "playing":
 
         just_pressed = False
+        escaped_to_menu = False
         # Обработка событий игрового процесса
 
         for event in pygame.event.get():
@@ -232,6 +242,8 @@ while running:
                         pygame.mixer.music.stop()
                     except:
                         pass
+                    escaped_to_menu = True
+                    break  # прерываем обработку остальных событий в этом кадре
 
                 if event.key == pygame.K_SPACE:
                     space_pressed = True
@@ -244,12 +256,15 @@ while running:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 just_pressed = True
                 player.jump()
+        if escaped_to_menu:
+            # Уже перешли в меню — не выполняем физику/отрисовку игры в этом кадре
+            continue
 
             # Физика и обновление
         player.update(space_held=space_pressed)
         level.update()
 
-        # ИСПРАВЛЕНО: Вызываем проверку один раз и сохраняем результат в переменную
+        # Вызываем проверку один раз и сохраняем результат в переменную
         player_rect = player.get_rect()
         hit_object = level.check_collisions(player_rect, player)
 
@@ -258,23 +273,19 @@ while running:
                 game_state = "game_over"
                 pygame.mixer.music.stop()  # Останавливаем музыку при смерти
 
-            if hit_object.type == "DEATH":
-                game_state = "game_over"
-            if just_pressed:  # Игрок нажал прыжок именно в этот кадр
+            elif hit_object.type == "DBL_JMP" and just_pressed:
+                level.dj_orbs.remove(hit_object)
+                player.vel_y = 0
+                player.can_jump = True
+                player.jump()
+                just_pressed = False
 
-                # Проверяем ТИП орба и выполняем нужное действие
-                if hit_object.type == "DBL_JMP":
-                    level.dj_orbs.remove(hit_object)
-                    player.vel_y = 0  # Удаляем из списка желтых
-                    player.can_jump = True
-                    player.jump()
-                    just_pressed = False
-
-                elif hit_object.type == "GRAVITY_CHANGE":
-                    level.gr_orbs.remove(hit_object)  # ...или из списка розовых
-                    player.gravity *= -1
-                    player.jump_strength *= -1
-                    player.jump()
+            elif hit_object.type == "GRAVITY_CHANGE" and just_pressed:
+                level.gr_orbs.remove(hit_object)
+                player.gravity *= -1
+                player.jump_strength *= -1
+                player.jump()
+                just_pressed = False
 
         # Проверка победы (достижение финиша)
         if level.world_offset >= FINISH_LINE:
@@ -291,12 +302,14 @@ while running:
 
         # UI
         font = pygame.font.SysFont(None, 36)
-        score_text = font.render(f"Счет: {level.score}", True, WHITE)
-        screen.blit(score_text, (10, 10))
+        percent = get_progress_percent(level)
+        progress_text = font.render(f"Прогресс: {percent}%", True, WHITE)
+        screen.blit(progress_text, (10, 10))
         pygame.display.flip()
 
     elif game_state == "game_over":
-        draw_game_over(level.score)
+        progress_percent = get_progress_percent(level)
+        draw_game_over(progress_percent, level.bg_image)
         try:
             pygame.mixer.music.stop()
         except:
@@ -308,6 +321,7 @@ while running:
             game_state = "playing"
             game_over_timer = 0
             space_pressed = False
+            level.play_music()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -331,9 +345,10 @@ while running:
                     game_state = "playing"
                     game_over_timer = 0
                     space_pressed = False
+                    level.play_music()
 
     elif game_state == "victory":
-        draw_victory(level.score)
+        draw_victory(100)
 
         try:
             pygame.mixer.music.stop()
@@ -355,11 +370,12 @@ while running:
                     except:
                         pass
 
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_SPACE:
-                    # Перезапустить уровень заново
+                # SPACE → перезапустить уровень заново
+                if event.key == pygame.K_SPACE:
                     player, level, curr_lvl = reset_game(selected_level)
                     game_state = "playing"
                     space_pressed = False
+                    level.play_music()
 
 pygame.quit()
 sys.exit()

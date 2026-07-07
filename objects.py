@@ -9,6 +9,7 @@ class Object:
         self.x = self.rect.x
         self.y = self.rect.y
         self.right = self.x + width
+        self.type = None
 
     def update_list(self, list, game_speed):
         self.x -= game_speed
@@ -58,13 +59,13 @@ class Slab(Object):
         self.type = "DEATH"
 
 
-class Spike:
+class Spike(Object):
     def __init__(self, x, y):
         super().__init__(x, y, width=BLOCK_SIZE, height=BLOCK_SIZE)
         self.type = "DEATH"
 
 
-class CeilingSpike:
+class CeilingSpike(Object):
     def __init__(self, x, y):
         super().__init__(x, y, width=BLOCK_SIZE, height=BLOCK_SIZE)
         self.type = "DEATH"

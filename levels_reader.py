@@ -1,6 +1,6 @@
 import pygame
 from settings import SCREEN_WIDTH, RED, BLOCK_SIZE
-from objects import Object, DoubleJumpOrb, GravityChangeOrb, Platform, Slab
+from objects import Object, DoubleJumpOrb, GravityChangeOrb, Platform, Slab, Spike
 
 class LevelReader:
     def __init__(self, lvl, floor_y):
@@ -41,7 +41,7 @@ class LevelReader:
                 if char == "P":
                     self.platforms.append(Platform(x,y))
                 elif char == "X":
-                    self.obstacles.append(pygame.Rect(x, y, BLOCK_SIZE, BLOCK_SIZE))
+                    self.obstacles.append(Spike(x,y))
                 elif char == "M":
                     self.ceil_obstacles.append(
                         pygame.Rect(x, y, BLOCK_SIZE, BLOCK_SIZE)
@@ -72,9 +72,9 @@ class LevelReader:
         self.score += self.game_speed 
         
         # Сдвиг объектов и очистка
-        for spike in self.obstacles: spike.x -= self.game_speed
+        for spike in self.obstacles: spike.rect.x -= self.game_speed
 
-        self.obstacles = [s for s in self.obstacles if s.right > 0]
+        self.obstacles = [s for s in self.obstacles if s.rect.right > 0]
 
         for c_spike in self.ceil_obstacles:
             c_spike.x -= self.game_speed
@@ -146,7 +146,7 @@ class LevelReader:
                             if space_held:
                                 player.jump()
                                 player_rect.y = player.y
-                                return None
+                            return None
 
         # ИНВЕРТИРОВАННАЯ ГРАВИТАЦИЯ (приземляемся «снизу» на платформу)
         elif player.gravity < 0:
@@ -168,7 +168,7 @@ class LevelReader:
                             if space_held:
                                 player.jump()
                                 player_rect.y = player.y
-                                return None
+                            return None
 
         # 4. УДАР БОКОМ В СТЕНУ (Фронтальное столкновение)
         if not player.on_platform:
@@ -206,9 +206,9 @@ class LevelReader:
 
         for spike in self.obstacles:
             points = [
-                (spike.left, spike.bottom),
-                (spike.centerx, spike.top),
-                (spike.right, spike.bottom),
+                (spike.rect.left, spike.rect.bottom),
+                (spike.rect.centerx, spike.rect.top),
+                (spike.rect.right, spike.rect.bottom),
             ]
             pygame.draw.polygon(screen, RED, points)
 

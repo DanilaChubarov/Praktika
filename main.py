@@ -248,12 +248,14 @@ while running:
                 if event.key == pygame.K_SPACE:
                     space_pressed = True
                     just_pressed = True
+                    just_pressed = True
                     player.jump()
 
             if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
                 space_pressed = False
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                just_pressed = True
                 just_pressed = True
                 player.jump()
         if escaped_to_menu:

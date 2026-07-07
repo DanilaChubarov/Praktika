@@ -39,6 +39,25 @@ class LevelReader:
 
         START_OFFSET = 0
 
+        pygame.mixer.music.load(lvl.music_name)
+
+        BLOCK_SIZE = 40
+        START_OFFSET = 0
+
+        self.dj_orb_texture = pygame.image.load(
+            "media/textures/double_jump.png"
+        ).convert_alpha()
+        self.dj_orb_texture = pygame.transform.scale(
+            self.dj_orb_texture, (BLOCK_SIZE, BLOCK_SIZE)
+        )
+
+        self.gr_orb_texture = pygame.image.load(
+            "media/textures/gravity_orb.png"
+        ).convert_alpha()
+        self.gr_orb_texture = pygame.transform.scale(
+            self.gr_orb_texture, (BLOCK_SIZE, BLOCK_SIZE)
+        )
+
         for row_index, row in enumerate(lvl.map):
             for col_index, char in enumerate(row):
                 x = START_OFFSET + (col_index * BLOCK_SIZE)
@@ -95,9 +114,12 @@ class LevelReader:
         self.gr_orbs = [orb for orb in self.gr_orbs if orb.rect.right > 0]
 
     def check_collisions(self, player_rect, player, space_held=False):
+        # ВАЖНО: сбрасываем флаг платформы в начале каждого кадра,
+        # иначе проверка удара об стену (пункт 4) перестанет работать
+        # после первого приземления.
         player.on_platform = False
 
-        # 1. СМЕРТЬ (обычные и потолочные шипы) — все объекты, всегда через .rect
+        # 1. Обычные и потолочные шипы — смерть
         for spike in self.obstacles:
             if player_rect.colliderect(spike.rect):
                 return spike
@@ -106,7 +128,7 @@ class LevelReader:
             if player_rect.colliderect(c_spike.rect):
                 return c_spike
 
-        # 2. ОРБЫ
+        # 2. ПРОВЕРЯЕМ ОРБЫ
         for orb in self.dj_orbs:
             if player_rect.colliderect(orb.rect):
                 return orb

@@ -40,7 +40,7 @@ class Slab(Object):
      def __init__(self, x, y):
         super().__init__(x, y, width=BLOCK_SIZE, height=BLOCK_SIZE//2)
         self.type = "DEATH"
-class Spike:
+class Spike(Object):
      def __init__(self, x, y):
         super().__init__(x, y, width=BLOCK_SIZE, height=BLOCK_SIZE)
         self.type = "DEATH"

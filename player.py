@@ -63,7 +63,7 @@ class Player:
             # Автопрыжок от потолка
             if space_held:
                 self.jump()
-
+        
         # Вращение
         if self.gravity > 0:
             if not self.is_jumping:

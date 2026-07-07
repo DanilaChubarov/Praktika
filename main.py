@@ -256,7 +256,7 @@ while running:
 
         # ИСПРАВЛЕНО: Вызываем проверку один раз и сохраняем результат в переменную
         player_rect = player.get_rect()
-        hit_object = level.check_collisions(player_rect, player)
+        hit_object = level.check_collisions(player_rect, player, space_held=space_pressed)
          
             
         if hit_object is not None:  # Игрок столкнулся с каким-то орбом

@@ -1,6 +1,7 @@
 import pygame
 from settings import SCREEN_HEIGHT, CYAN
 
+
 class Player:
     def __init__(self, lvl, x, floor_y):
         self.size = 40
@@ -8,7 +9,7 @@ class Player:
         self.floor_y = floor_y
         self.y = floor_y - self.size
         self.game_speed = lvl.lvl_speed
-        
+
         self.vel_y = 0
         self.gravity = 1
         self.jump_strength = -14
@@ -19,9 +20,11 @@ class Player:
         self.was_in_air = False  # Флаг для отслеживания приземления
         self.just_landed = False  # Флаг для защиты от дребезга
         self.used_orb = False
-        
+
         # Загрузка текстуры
-        self.texture = pygame.image.load("media/textures/basket_ball.png").convert_alpha()
+        self.texture = pygame.image.load(
+            "media/textures/basket_ball.png"
+        ).convert_alpha()
         self.texture = pygame.transform.scale(self.texture, (self.size, self.size))
 
     def jump(self):
@@ -42,28 +45,29 @@ class Player:
             self.vel_y = 0
             self.is_jumping = False
             self.can_jump = True
-            
+
             # Если пробел зажат И мы были в воздухе И не только что приземлились
             if space_held and self.was_in_air and not self.just_landed:
                 self.jump()
                 self.just_landed = True
-            
+
             self.was_in_air = False
         else:
             # Мы в воздухе
+            # Мы в воздухе
             self.was_in_air = True
             self.just_landed = False
-            
+
         if self.gravity < 0 and self.y <= 0:
             self.y = 0
             self.vel_y = 0
             self.is_jumping = False
             self.can_jump = True
-            
+
             # Автопрыжок от потолка
             if space_held:
                 self.jump()
-        
+
         # Вращение
         if self.gravity > 0:
             if not self.is_jumping:
@@ -75,7 +79,6 @@ class Player:
                 self.angle += self.game_speed * 1.5
             else:
                 self.angle += 5
-            
 
     def draw(self, screen):
         rotated_ball = pygame.transform.rotate(self.texture, self.angle)
@@ -84,4 +87,4 @@ class Player:
         screen.blit(rotated_ball, rect.topleft)
 
     def get_rect(self):
-        return pygame.Rect(self.x + 3 , self.y+3, self.size-12, self.size-12)
+        return pygame.Rect(self.x + 3, self.y + 3, self.size - 12, self.size - 12)

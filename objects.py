@@ -14,7 +14,7 @@ class Object:
 
 class DoubleJumpOrb(Object):
     def __init__(self, x, y):
-        super().__init__(x, y, width=BLOCK_SIZE+5, height=BLOCK_SIZE+5)
+        super().__init__(x, y, width=BLOCK_SIZE+10, height=BLOCK_SIZE+10)
         self.type = "DBL_JMP"
         self.texture = pygame.image.load("media/textures/double_jump.png").convert_alpha()
         self.texture = pygame.transform.scale(self.texture, (BLOCK_SIZE, BLOCK_SIZE))
@@ -22,7 +22,7 @@ class DoubleJumpOrb(Object):
         screen.blit(self.texture, (self.rect.x, self.rect.y))
 class GravityChangeOrb(Object):
     def __init__(self, x, y):
-        super().__init__(x, y, width=BLOCK_SIZE+5, height=BLOCK_SIZE+5)
+        super().__init__(x, y, width=BLOCK_SIZE+10, height=BLOCK_SIZE+10)
         self.type = "GRAVITY_CHANGE"
         self.texture = pygame.image.load("media/textures/gravity_orb.png").convert_alpha()
         self.texture = pygame.transform.scale(self.texture, (BLOCK_SIZE, BLOCK_SIZE))

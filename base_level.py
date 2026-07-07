@@ -24,7 +24,7 @@ class BaseLevel:
         self.bg_speed = bg_speed
         self.bg_x1 = 0
         self.bg_x2 = SCREEN_WIDTH
-        self.music_name = f"media/music/lvl1_secondpart.mp3"
+        self.music_name = f"media/music/level{level_num}_music.mp3."
 
     def getMap(self):
         return self.map

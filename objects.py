@@ -19,7 +19,8 @@ class Object:
 
 class DoubleJumpOrb(Object):
     def __init__(self, x, y):
-        super().__init__(x, y, width=BLOCK_SIZE+10, height=BLOCK_SIZE+10)
+        self.padding = 20 
+        super().__init__(x - self.padding//2, y - self.padding//2, width=BLOCK_SIZE+self.padding, height=BLOCK_SIZE+self.padding)
         self.type = "DBL_JMP"
         self.texture = pygame.image.load(
             "media/textures/double_jump.png"
@@ -27,12 +28,13 @@ class DoubleJumpOrb(Object):
         self.texture = pygame.transform.scale(self.texture, (BLOCK_SIZE, BLOCK_SIZE))
 
     def draw(self, screen):
-        screen.blit(self.texture, (self.rect.x, self.rect.y))
-
+        screen.blit(self.texture, (self.rect.x + self.padding//2, self.rect.y+self.padding//2))
+        #pygame.draw.rect(screen, (0,0,0), self.rect, 1)
 
 class GravityChangeOrb(Object):
     def __init__(self, x, y):
-        super().__init__(x, y, width=BLOCK_SIZE+10, height=BLOCK_SIZE+10)
+        self.padding = 20
+        super().__init__(x - self.padding//2, y - self.padding//2, width=BLOCK_SIZE+self.padding, height=BLOCK_SIZE+self.padding)
         self.type = "GRAVITY_CHANGE"
         self.texture = pygame.image.load(
             "media/textures/gravity_orb.png"
@@ -40,7 +42,8 @@ class GravityChangeOrb(Object):
         self.texture = pygame.transform.scale(self.texture, (BLOCK_SIZE, BLOCK_SIZE))
 
     def draw(self, screen):
-        screen.blit(self.texture, (self.rect.x, self.rect.y))
+        screen.blit(self.texture, (self.rect.x + self.padding//2, self.rect.y+self.padding//2))
+        #pygame.draw.rect(screen, (0,0,0), self.rect, 1)
 
 
 class Platform(Object):

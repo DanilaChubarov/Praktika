@@ -31,8 +31,8 @@ clock = pygame.time.Clock()
 floor_y = SCREEN_HEIGHT - 60
 FINISH_LINE = 30000
 
-# Загружаем фоновую картинку для меню (такая же, как в игре)
-menu_bg = pygame.image.load("media/background/level1_bg.jpg").convert()
+
+menu_bg = pygame.image.load("media/background/menu_bg.jpg").convert()
 menu_bg = pygame.transform.scale(menu_bg, (SCREEN_WIDTH, SCREEN_HEIGHT))
 
 btn_width = 220
@@ -49,6 +49,16 @@ LEVEL2_BTN = pygame.Rect(start_x + btn_width + spacing, 160, btn_width, btn_heig
 LEVEL3_BTN = pygame.Rect(
     start_x + (btn_width + spacing) * 2, 160, btn_width, btn_height
 )
+
+# Загрузка картинок для кнопок уровней
+level1_btn_img = pygame.image.load("media/background/level1_bg.jpg").convert()
+level1_btn_img = pygame.transform.scale(level1_btn_img, (btn_width, btn_height))
+
+level2_btn_img = pygame.image.load("media/background/level2_bg.jpg").convert()
+level2_btn_img = pygame.transform.scale(level2_btn_img, (btn_width, btn_height))
+
+level3_btn_img = pygame.image.load("media/background/level3_bg.jpg").convert()
+level3_btn_img = pygame.transform.scale(level3_btn_img, (btn_width, btn_height))
 
 
 def get_progress_percent(level):
@@ -68,17 +78,18 @@ def draw_menu():
     screen.blit(overlay, (0, 0))
 
     font_title = pygame.font.SysFont(None, 64)
-    font_level = pygame.font.SysFont(None, 36)
-    font_small = pygame.font.SysFont(None, 24)
+    font_level = pygame.font.SysFont(None, 40, bold=True)
+    font_small = pygame.font.SysFont(None, 30)
 
     # Заголовок
     title = font_title.render("GEOMETRY DASH", True, WHITE)
     screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 30))
 
     # ---------- КНОПКА LEVEL 1 ----------
-    color1 = (70, 160, 70)
-    pygame.draw.rect(screen, color1, LEVEL1_BTN, border_radius=15)
+    screen.blit(level1_btn_img, (LEVEL1_BTN.x, LEVEL1_BTN.y))
     pygame.draw.rect(screen, WHITE, LEVEL1_BTN, 2, border_radius=15)
+    # pygame.draw.rect(screen, color1, LEVEL1_BTN, border_radius=15)
+    # pygame.draw.rect(screen, WHITE, LEVEL1_BTN, 2, border_radius=15)
 
     text = font_level.render("LEVEL 1", True, WHITE)
     screen.blit(text, (LEVEL1_BTN.centerx - text.get_width() // 2, LEVEL1_BTN.y + 50))
@@ -90,8 +101,7 @@ def draw_menu():
     screen.blit(play, (LEVEL1_BTN.centerx - play.get_width() // 2, LEVEL1_BTN.y + 150))
 
     # ---------- КНОПКА LEVEL 2 ----------
-    color2 = (180, 160, 70)
-    pygame.draw.rect(screen, color2, LEVEL2_BTN, border_radius=15)
+    screen.blit(level2_btn_img, (LEVEL2_BTN.x, LEVEL2_BTN.y))
     pygame.draw.rect(screen, WHITE, LEVEL2_BTN, 2, border_radius=15)
 
     text = font_level.render("LEVEL 2", True, WHITE)
@@ -104,8 +114,7 @@ def draw_menu():
     screen.blit(play, (LEVEL2_BTN.centerx - play.get_width() // 2, LEVEL2_BTN.y + 150))
 
     # ---------- КНОПКА LEVEL 3 ----------
-    color3 = (160, 70, 70)
-    pygame.draw.rect(screen, color3, LEVEL3_BTN, border_radius=15)
+    screen.blit(level3_btn_img, (LEVEL3_BTN.x, LEVEL3_BTN.y))
     pygame.draw.rect(screen, WHITE, LEVEL3_BTN, 2, border_radius=15)
 
     text = font_level.render("LEVEL 3", True, WHITE)

@@ -8,7 +8,8 @@ from settings import (
     FPS,
 )
 from player import Player
-from levels_reader import LevelReader
+from levels_reader import LevelReader, GameState
+
 
 # Импортируем уровни
 from levels.level1 import LevelOne
@@ -258,7 +259,10 @@ while running:
                     space_pressed = True
                     just_pressed = True
                     just_pressed = True
-                    player.jump()
+                    if level.game_mode == GameState.CUBE:
+                        player.jump()
+                    if level.game_mode == GameState.SHIP:
+                        player.fly(space_pressed)
 
             if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
                 space_pressed = False
@@ -266,7 +270,11 @@ while running:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 just_pressed = True
                 just_pressed = True
-                player.jump()
+                if level.game_mode == GameState.CUBE:
+                        player.jump()
+                if level.game_mode == GameState.SHIP:
+                        player.fly(space_pressed)
+
         if escaped_to_menu:
             # Уже перешли в меню — не выполняем физику/отрисовку игры в этом кадре
             continue
@@ -297,6 +305,9 @@ while running:
                 player.jump_strength *= -1
                 player.jump()
                 just_pressed = False
+            elif hit_object.type == "SHIP_P":
+                level.game_mode = GameState.SHIP
+                
 
         # Проверка победы (достижение финиша)
         if level.world_offset >= FINISH_LINE:

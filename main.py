@@ -10,7 +10,6 @@ from settings import (
 from player import Player
 from levels_reader import LevelReader, GameState
 
-
 # Импортируем уровни
 from levels.level1 import LevelOne
 from levels.level2 import LevelTwo
@@ -160,15 +159,20 @@ def draw_game_over(final_score, level_bg):
     pygame.display.flip()
 
 
-def draw_victory(final_score):
+def draw_victory(percent, background):
     """Отрисовка экрана победы"""
-    screen.fill(BLACK)
+    screen.blit(background, (0, 0))
+
     font = pygame.font.SysFont(None, 72)
     font_small = pygame.font.SysFont(None, 36)
 
+    # percent = get_progress_percent(level)
+
     victory_text = font.render("ПОБЕДА!", True, (50, 255, 50))
-    score_text = font_small.render(f"Финальный счет: {final_score}", True, WHITE)
-    restart_text = font_small.render("SPACE - В главное меню", True, WHITE)
+    score_text = font_small.render(f"Результат: {percent}%", True, WHITE)
+    restart_text = font_small.render(
+        "ESC - В главное меню   /   SPACE - заново", True, WHITE
+    )
 
     screen.blit(victory_text, (SCREEN_WIDTH // 2 - victory_text.get_width() // 2, 150))
     screen.blit(score_text, (SCREEN_WIDTH // 2 - score_text.get_width() // 2, 250))
@@ -271,9 +275,9 @@ while running:
                 just_pressed = True
                 just_pressed = True
                 if level.game_mode == GameState.CUBE:
-                        player.jump()
+                    player.jump()
                 if level.game_mode == GameState.SHIP:
-                        player.fly(space_pressed)
+                    player.fly(space_pressed)
 
         if escaped_to_menu:
             # Уже перешли в меню — не выполняем физику/отрисовку игры в этом кадре
@@ -307,7 +311,6 @@ while running:
                 just_pressed = False
             elif hit_object.type == "SHIP_P":
                 level.game_mode = GameState.SHIP
-                
 
         # Проверка победы (достижение финиша)
         if level.world_offset >= FINISH_LINE:
@@ -370,7 +373,7 @@ while running:
                     level.play_music()
 
     elif game_state == "victory":
-        draw_victory(100)
+        draw_victory(get_progress_percent(level), curr_lvl.bg_image)
 
         try:
             pygame.mixer.music.stop()

@@ -22,7 +22,8 @@ class Player:
         self.just_landed = False  # Флаг для защиты от дребезга
         self.used_orb = False
         self.texture_path="media/textures/basket_ball.png"
-
+        self.wave_trail = []       # Список для хранения координат (x, y)
+        self.max_trail_length = 60 # Длина следа в кадрах (примерно 1 секунда при 60 FPS)
         # Загрузка текстуры
         self.texture = pygame.image.load(
             self.texture_path
@@ -114,6 +115,50 @@ class Player:
             # Вверх летит — нос задирается, вниз падает — опускается
             target_angle = -self.vel_y * 4 if self.gravity > 0 else self.vel_y * 4
             self.angle += (target_angle - self.angle) * 0.2
+        elif game_mode == GameState.WAVE:
+            # --- РЕЖИМ ВОЛНЫ ---
+            # Скорость волны должна быть завязана на скорость игры, чтобы угол всегда был 45 градусов.
+            # Если ваша волна двигается по оси X со скоростью self.game_speed, то и по Y она должна лететь с такой же скоростью.
+            wave_speed = self.game_speed
+
+            if space_held:
+                # При зажатом пробеле летим вверх (вниз при инвертированной гравитации)
+                self.vel_y = -wave_speed if self.gravity > 0 else wave_speed
+                self.angle = 45 if self.gravity > 0 else -45
+            else:
+                # Когда пробел отпущен, падаем вниз (вверх при инвертированной гравитации)
+                self.vel_y = wave_speed if self.gravity > 0 else -wave_speed
+                self.angle = -45 if self.gravity > 0 else 45
+
+            # Применяем скорость к координате Y
+            self.y += self.vel_y
+
+            # Ограничение пола (волна мгновенно скользит по полу горизонтально)
+            if self.y >= self.floor_y - self.size:
+                self.y = self.floor_y - self.size
+                self.vel_y = 0
+                self.angle = 0  # Прижимается к полу ровно
+
+            # Ограничение потолка (волна мгновенно скользит по потолку горизонтально)
+            if self.y <= 0:
+                self.y = 0
+                self.vel_y = 0
+                self.angle = 0  # Прижимается к потолку ровно
+            self.wave_trail = [(x - self.game_speed, y) for x, y in self.wave_trail]
+        
+            # 2. Добавляем текущую позицию центра волны (или ее задней части)
+            # Предполагаем, что self.x — это горизонтальная позиция игрока на экране (обычно фиксированная)
+            trail_x = self.x + self.size / 2
+            trail_y = self.y + self.size / 2
+            self.wave_trail.append((trail_x, trail_y))
+            
+            # 3. Обрезаем след, если он стал слишком длинным
+            if len(self.wave_trail) > self.max_trail_length:
+                self.wave_trail.pop(0)
+            else:
+                # Если режим сменился, плавно или мгновенно очищаем след
+                if self.wave_trail:
+                    self.wave_trail.clear()
     def fly(self, space_held):
         """Физика полета для режима корабля (SHIP)"""
         # Константы для настройки физики корабля (можно вынести в settings.py)

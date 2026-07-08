@@ -311,14 +311,23 @@ while running:
                 just_pressed = False
             elif hit_object.type == "SHIP_P":
                 level.game_mode = GameState.SHIP
+                player.size = 40
                 player.texture_path = "media/textures/ship.jpg"
                 player.texture = pygame.image.load(player.texture_path).convert_alpha()
                 player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
             elif hit_object.type == "CUBE_P":
                 level.game_mode = GameState.CUBE
                 player.texture_path = "media/textures/basket_ball.png"
+                player.size = 40
                 player.texture = pygame.image.load(player.texture_path).convert_alpha()
                 player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
+            elif hit_object.type == "WAVE_P":
+                level.game_mode = GameState.WAVE
+                player.texture_path = "media/textures/wave.png"
+                player.size = 30
+                player.texture = pygame.image.load(player.texture_path).convert_alpha()
+                player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
+                
                 
 
         # Проверка победы (достижение финиша)

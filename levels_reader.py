@@ -9,7 +9,8 @@ from objects import (
     Spike,
     CeilingSpike,
     ShipPortal,
-    CubePortal
+    CubePortal,
+    WavePortal
 )
 from enum import Enum, auto
 
@@ -29,6 +30,7 @@ class LevelReader:
         self.gr_orbs = []
         self.sh_ports = []
         self.c_ports = []
+        self.w_ports = []
         self.game_mode = GameState.CUBE
 
         self.bg_image = pygame.transform.scale(
@@ -72,6 +74,8 @@ class LevelReader:
                     self.sh_ports.append(ShipPortal(x, y))
                 elif char == "C":
                     self.c_ports.append(CubePortal(x, y))
+                elif char == "W":
+                    self.c_ports.append(WavePortal(x, y))
 
     def update(self):
         # Движение фона
@@ -115,6 +119,9 @@ class LevelReader:
         for port in self.c_ports:
             port.rect.x -= self.game_speed
         self.c_ports = [port for port in self.c_ports if port.rect.right > 0]
+        for port in self.w_ports:
+            port.rect.x -= self.game_speed
+        self.w_ports = [port for port in self.w_ports if port.rect.right > 0]
 
     def check_collisions(self, player_rect, player, space_held=False):
         # ВАЖНО: сбрасываем флаг платформы в начале каждого кадра,
@@ -143,6 +150,9 @@ class LevelReader:
             if player_rect.colliderect(port.rect):
                 return port
         for port in self.c_ports:
+            if player_rect.colliderect(port.rect):
+                return port
+        for port in self.w_ports:
             if player_rect.colliderect(port.rect):
                 return port
               
@@ -241,6 +251,8 @@ class LevelReader:
         for port in self.sh_ports:
             port.draw(screen)
         for port in self.c_ports:
+            port.draw(screen)
+        for port in self.w_ports:
             port.draw(screen)
 
     def play_music(self):

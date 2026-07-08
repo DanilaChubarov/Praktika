@@ -103,3 +103,11 @@ class CubePortal(Object):
         self.texture = pygame.transform.scale(self.texture, (BLOCK_SIZE, BLOCK_SIZE*3))
     def draw(self, screen):
         screen.blit(self.texture, (self.rect.x, self.rect.y))
+class WavePortal(Object):
+    def __init__(self, x, y):
+        super().__init__(x, y, width=BLOCK_SIZE, height=BLOCK_SIZE*3)
+        self.type = "WAVE_P"
+        self.texture = pygame.image.load("media/textures/wave_portal.png").convert_alpha()
+        self.texture = pygame.transform.scale(self.texture, (BLOCK_SIZE, BLOCK_SIZE*3))
+    def draw(self, screen):
+        screen.blit(self.texture, (self.rect.x, self.rect.y))

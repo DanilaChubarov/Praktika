@@ -28,7 +28,7 @@ clock = pygame.time.Clock()
 
 # Переменные мира
 floor_y = SCREEN_HEIGHT - 60
-FINISH_LINE = 30000
+FINISH_LINE = 22000
 
 
 menu_bg = pygame.image.load("media/background/menu_bg.jpg").convert()
@@ -284,7 +284,7 @@ while running:
             continue
 
             # Физика и обновление
-        player.update(space_held=space_pressed)
+        player.update(level.game_mode, space_held=space_pressed)
         level.update()
 
         # Вызываем проверку один раз и сохраняем результат в переменную
@@ -311,6 +311,15 @@ while running:
                 just_pressed = False
             elif hit_object.type == "SHIP_P":
                 level.game_mode = GameState.SHIP
+                player.texture_path = "media/textures/ship.jpg"
+                player.texture = pygame.image.load(player.texture_path).convert_alpha()
+                player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
+            elif hit_object.type == "CUBE_P":
+                level.game_mode = GameState.CUBE
+                player.texture_path = "media/textures/basket_ball.png"
+                player.texture = pygame.image.load(player.texture_path).convert_alpha()
+                player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
+                
 
         # Проверка победы (достижение финиша)
         if level.world_offset >= FINISH_LINE:

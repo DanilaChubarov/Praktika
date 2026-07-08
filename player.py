@@ -155,10 +155,9 @@ class Player:
             # 3. Обрезаем след, если он стал слишком длинным
             if len(self.wave_trail) > self.max_trail_length:
                 self.wave_trail.pop(0)
-            else:
-                # Если режим сменился, плавно или мгновенно очищаем след
-                if self.wave_trail:
-                    self.wave_trail.clear()
+        if game_mode!= GameState.WAVE:
+            if self.wave_trail:
+                self.wave_trail.clear()
     def fly(self, space_held):
         """Физика полета для режима корабля (SHIP)"""
         # Константы для настройки физики корабля (можно вынести в settings.py)
@@ -182,11 +181,15 @@ class Player:
         # Применяем изменение позиции
         self.y += self.vel_y
 
-    def draw(self, screen):
+    def draw(self, screen, game_mode):
+        if game_mode == GameState.WAVE and len(self.wave_trail) > 1:
+            pygame.draw.lines(screen, (0, 255, 255), False, self.wave_trail, 10)
         rotated_ball = pygame.transform.rotate(self.texture, self.angle)
         rect = rotated_ball.get_rect()
         rect.center = (self.x + self.size // 2, self.y + self.size // 2)
         screen.blit(rotated_ball, rect.topleft)
+
+            
 
     def get_rect(self):
         return pygame.Rect(self.x + 3, self.y + 3, self.size - 12, self.size - 12)

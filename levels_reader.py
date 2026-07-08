@@ -10,7 +10,9 @@ from objects import (
     CeilingSpike,
     ShipPortal,
     CubePortal,
-    WavePortal
+    WavePortal,
+    SlowPortal,
+    SpeedPortal
 )
 from enum import Enum, auto
 
@@ -31,6 +33,9 @@ class LevelReader:
         self.sh_ports = []
         self.c_ports = []
         self.w_ports = []
+        self.sp_ports = []
+        self.sl_ports = []
+        
         self.game_mode = GameState.CUBE
 
         self.bg_image = pygame.transform.scale(
@@ -76,6 +81,10 @@ class LevelReader:
                     self.c_ports.append(CubePortal(x, y))
                 elif char == "W":
                     self.c_ports.append(WavePortal(x, y))
+                elif char == "<":
+                    self.sl_ports.append(SlowPortal(x, y))
+                elif char == ">":
+                    self.sp_ports.append(SpeedPortal(x, y))
 
     def update(self):
         # Движение фона
@@ -122,6 +131,12 @@ class LevelReader:
         for port in self.w_ports:
             port.rect.x -= self.game_speed
         self.w_ports = [port for port in self.w_ports if port.rect.right > 0]
+        for port in self.sl_ports:
+            port.rect.x -= self.game_speed
+        self.sl_ports = [port for port in self.sl_ports if port.rect.right > 0]
+        for port in self.sp_ports:
+            port.rect.x -= self.game_speed
+        self.sp_ports = [port for port in self.sp_ports if port.rect.right > 0]
 
     def check_collisions(self, player_rect, player, space_held=False):
         # ВАЖНО: сбрасываем флаг платформы в начале каждого кадра,
@@ -153,6 +168,12 @@ class LevelReader:
             if player_rect.colliderect(port.rect):
                 return port
         for port in self.w_ports:
+            if player_rect.colliderect(port.rect):
+                return port
+        for port in self.sl_ports:
+            if player_rect.colliderect(port.rect):
+                return port
+        for port in self.sp_ports:
             if player_rect.colliderect(port.rect):
                 return port
               
@@ -253,6 +274,10 @@ class LevelReader:
         for port in self.c_ports:
             port.draw(screen)
         for port in self.w_ports:
+            port.draw(screen)
+        for port in self.sl_ports:
+            port.draw(screen)
+        for port in self.sp_ports:
             port.draw(screen)
 
     def play_music(self):

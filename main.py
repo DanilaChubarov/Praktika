@@ -327,6 +327,12 @@ while running:
                 player.size = 30
                 player.texture = pygame.image.load(player.texture_path).convert_alpha()
                 player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
+            elif hit_object.type == "SLOW_P":
+                player.game_speed -=0.25
+                level.game_speed -=0.25
+            elif hit_object.type == "SPEED_P":
+                player.game_speed += 0.25
+                level.game_speed +=0.25
                 
                 
 
@@ -341,7 +347,7 @@ while running:
         # Отрисовка игры
 
         level.draw(screen)
-        player.draw(screen)
+        player.draw(screen, level.game_mode)
 
         # UI
         font = pygame.font.SysFont(None, 36)

@@ -314,21 +314,25 @@ while running:
                 player.size = 40
                 player.texture_path = "media/textures/ship.jpg"
                 player.texture = pygame.image.load(player.texture_path).convert_alpha()
-                player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
+                player.texture = pygame.transform.scale(
+                    player.texture, (player.size, player.size)
+                )
             elif hit_object.type == "CUBE_P":
                 level.game_mode = GameState.CUBE
                 player.texture_path = "media/textures/basket_ball.png"
                 player.size = 40
                 player.texture = pygame.image.load(player.texture_path).convert_alpha()
-                player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
+                player.texture = pygame.transform.scale(
+                    player.texture, (player.size, player.size)
+                )
             elif hit_object.type == "WAVE_P":
                 level.game_mode = GameState.WAVE
                 player.texture_path = "media/textures/wave.png"
                 player.size = 30
                 player.texture = pygame.image.load(player.texture_path).convert_alpha()
-                player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
-                
-                
+                player.texture = pygame.transform.scale(
+                    player.texture, (player.size, player.size)
+                )
 
         # Проверка победы (достижение финиша)
         if level.world_offset >= FINISH_LINE:
@@ -359,7 +363,7 @@ while running:
             pass
         # перезапуск через 2 секунды
         game_over_timer += 1
-        if game_over_timer >= FPS * 2:
+        if game_over_timer >= FPS:
             player, level, curr_lvl = reset_game(selected_level)
             game_state = "playing"
             game_over_timer = 0

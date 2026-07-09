@@ -28,7 +28,7 @@ clock = pygame.time.Clock()
 
 # Переменные мира
 floor_y = SCREEN_HEIGHT - 60
-FINISH_LINE = 30000
+FINISH_LINE = 22000
 
 
 menu_bg = pygame.image.load("media/background/menu_bg.jpg").convert()
@@ -284,7 +284,7 @@ while running:
             continue
 
             # Физика и обновление
-        player.update(space_held=space_pressed)
+        player.update(level.game_mode, space_held=space_pressed)
         level.update()
 
         # Вызываем проверку один раз и сохраняем результат в переменную
@@ -311,6 +311,34 @@ while running:
                 just_pressed = False
             elif hit_object.type == "SHIP_P":
                 level.game_mode = GameState.SHIP
+                player.size = 40
+                player.texture_path = "media/textures/ship.jpg"
+                player.texture = pygame.image.load(player.texture_path).convert_alpha()
+                player.texture = pygame.transform.scale(
+                    player.texture, (player.size, player.size)
+                )
+            elif hit_object.type == "CUBE_P":
+                level.game_mode = GameState.CUBE
+                player.texture_path = "media/textures/basket_ball.png"
+                player.size = 40
+                player.texture = pygame.image.load(player.texture_path).convert_alpha()
+                player.texture = pygame.transform.scale(
+                    player.texture, (player.size, player.size)
+                )
+            elif hit_object.type == "WAVE_P":
+                level.game_mode = GameState.WAVE
+                player.texture_path = "media/textures/wave.png"
+                player.size = 30
+                player.texture = pygame.image.load(player.texture_path).convert_alpha()
+                player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
+            elif hit_object.type == "SLOW_P":
+                player.game_speed -=0.25
+                level.game_speed -=0.25
+            elif hit_object.type == "SPEED_P":
+                player.game_speed += 0.25
+                level.game_speed +=0.25
+                
+                
 
         # Проверка победы (достижение финиша)
         if level.world_offset >= FINISH_LINE:
@@ -323,7 +351,7 @@ while running:
         # Отрисовка игры
 
         level.draw(screen)
-        player.draw(screen)
+        player.draw(screen, level.game_mode)
 
         # UI
         font = pygame.font.SysFont(None, 36)
@@ -341,7 +369,7 @@ while running:
             pass
         # перезапуск через 2 секунды
         game_over_timer += 1
-        if game_over_timer >= FPS * 2:
+        if game_over_timer >= FPS:
             player, level, curr_lvl = reset_game(selected_level)
             game_state = "playing"
             game_over_timer = 0

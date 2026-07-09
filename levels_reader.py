@@ -8,7 +8,11 @@ from objects import (
     Slab,
     Spike,
     CeilingSpike,
-    ShipPortal
+    ShipPortal,
+    CubePortal,
+    WavePortal,
+    SlowPortal,
+    SpeedPortal
 )
 from enum import Enum, auto
 
@@ -27,6 +31,11 @@ class LevelReader:
         self.dj_orbs = []
         self.gr_orbs = []
         self.sh_ports = []
+        self.c_ports = []
+        self.w_ports = []
+        self.sp_ports = []
+        self.sl_ports = []
+        
         self.game_mode = GameState.CUBE
 
         self.bg_image = pygame.transform.scale(
@@ -68,6 +77,14 @@ class LevelReader:
                     self.gr_orbs.append(GravityChangeOrb(x, y))
                 elif char == "H":
                     self.sh_ports.append(ShipPortal(x, y))
+                elif char == "C":
+                    self.c_ports.append(CubePortal(x, y))
+                elif char == "W":
+                    self.c_ports.append(WavePortal(x, y))
+                elif char == "<":
+                    self.sl_ports.append(SlowPortal(x, y))
+                elif char == ">":
+                    self.sp_ports.append(SpeedPortal(x, y))
 
     def update(self):
         # Движение фона
@@ -108,6 +125,18 @@ class LevelReader:
         for port in self.sh_ports:
             port.rect.x -= self.game_speed
         self.sh_ports = [port for port in self.sh_ports if port.rect.right > 0]
+        for port in self.c_ports:
+            port.rect.x -= self.game_speed
+        self.c_ports = [port for port in self.c_ports if port.rect.right > 0]
+        for port in self.w_ports:
+            port.rect.x -= self.game_speed
+        self.w_ports = [port for port in self.w_ports if port.rect.right > 0]
+        for port in self.sl_ports:
+            port.rect.x -= self.game_speed
+        self.sl_ports = [port for port in self.sl_ports if port.rect.right > 0]
+        for port in self.sp_ports:
+            port.rect.x -= self.game_speed
+        self.sp_ports = [port for port in self.sp_ports if port.rect.right > 0]
 
     def check_collisions(self, player_rect, player, space_held=False):
         # ВАЖНО: сбрасываем флаг платформы в начале каждого кадра,
@@ -134,7 +163,18 @@ class LevelReader:
                 return orb
         for port in self.sh_ports:
             if player_rect.colliderect(port.rect):
-                print(port.type)
+                return port
+        for port in self.c_ports:
+            if player_rect.colliderect(port.rect):
+                return port
+        for port in self.w_ports:
+            if player_rect.colliderect(port.rect):
+                return port
+        for port in self.sl_ports:
+            if player_rect.colliderect(port.rect):
+                return port
+        for port in self.sp_ports:
+            if player_rect.colliderect(port.rect):
                 return port
               
         # 3. ПРИЗЕМЛЕНИЕ НА ПЛАТФОРМЫ И ПОЛУБЛОКИ
@@ -230,6 +270,14 @@ class LevelReader:
         for orb in self.gr_orbs:
             orb.draw(screen)
         for port in self.sh_ports:
+            port.draw(screen)
+        for port in self.c_ports:
+            port.draw(screen)
+        for port in self.w_ports:
+            port.draw(screen)
+        for port in self.sl_ports:
+            port.draw(screen)
+        for port in self.sp_ports:
             port.draw(screen)
 
     def play_music(self):

@@ -23,7 +23,7 @@ pygame.mixer.init()
 
 # Настройка окна
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Python Geometry Dash Clone")
+pygame.display.set_caption("Ball Dash")
 clock = pygame.time.Clock()
 
 # Переменные мира
@@ -81,7 +81,7 @@ def draw_menu():
     font_small = pygame.font.SysFont(None, 30)
 
     # Заголовок
-    title = font_title.render("GEOMETRY DASH", True, WHITE)
+    title = font_title.render("BALL DASH", True, WHITE)
     screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 30))
 
     # ---------- КНОПКА LEVEL 1 ----------
@@ -312,19 +312,15 @@ while running:
             elif hit_object.type == "SHIP_P":
                 level.game_mode = GameState.SHIP
                 player.size = 40
-                player.texture_path = "media/textures/ship.png2"
+                player.texture_path = "media/textures/ship.png"
                 player.texture = pygame.image.load(player.texture_path).convert_alpha()
-                player.texture = pygame.transform.scale(
-                    player.texture, (player.size, player.size)
-                )
+                player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
             elif hit_object.type == "CUBE_P":
                 level.game_mode = GameState.CUBE
                 player.texture_path = "media/textures/basket_ball.png"
                 player.size = 40
                 player.texture = pygame.image.load(player.texture_path).convert_alpha()
-                player.texture = pygame.transform.scale(
-                    player.texture, (player.size, player.size)
-                )
+                player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
             elif hit_object.type == "WAVE_P":
                 level.game_mode = GameState.WAVE
                 player.texture_path = "media/textures/wave.png"
@@ -332,11 +328,11 @@ while running:
                 player.texture = pygame.image.load(player.texture_path).convert_alpha()
                 player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
             elif hit_object.type == "SLOW_P":
-                player.game_speed -=0.5
-                level.game_speed -=0.5
+                player.game_speed -=0.25
+                level.game_speed -=0.25
             elif hit_object.type == "SPEED_P":
-                player.game_speed += 0.5
-                level.game_speed +=0.5
+                player.game_speed += 0.25
+                level.game_speed +=0.25
                 
                 
 
@@ -369,7 +365,7 @@ while running:
             pass
         # перезапуск через 2 секунды
         game_over_timer += 1
-        if game_over_timer >= FPS:
+        if game_over_timer >= FPS * 2:
             player, level, curr_lvl = reset_game(selected_level)
             game_state = "playing"
             game_over_timer = 0

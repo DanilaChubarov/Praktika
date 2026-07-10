@@ -3,7 +3,7 @@ from settings import SCREEN_HEIGHT, SCREEN_WIDTH
 
 
 class BaseLevel:
-    def __init__(self, level_num, lvl_speed, bg_speed):
+    def __init__(self, level_num, lvl_speed, bg_speed, finish_line):
         self.map = []
 
         # Автоматическое чтение нужной карты
@@ -25,6 +25,6 @@ class BaseLevel:
         self.bg_x1 = 0
         self.bg_x2 = SCREEN_WIDTH
         self.music_name = f"media/music/level{level_num}_music.mp3"
-
+        self.finish_line = finish_line
     def getMap(self):
         return self.map

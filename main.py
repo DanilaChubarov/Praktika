@@ -62,7 +62,7 @@ level3_btn_img = pygame.transform.scale(level3_btn_img, (btn_width, btn_height))
 
 def get_progress_percent(level):
     """Считает процент прохождения уровня (0-100)."""
-    return min(100, int(level.world_offset / FINISH_LINE * 100))
+    return min(100, int(level.world_offset / level.finish_line * 100))
 
 
 def draw_menu():
@@ -337,7 +337,7 @@ while running:
                 
 
         # Проверка победы (достижение финиша)
-        if level.world_offset >= FINISH_LINE:
+        if level.world_offset >= level.finish_line:
             game_state = "victory"
             try:
                 pygame.mixer.music.stop()

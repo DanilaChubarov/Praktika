@@ -172,9 +172,11 @@ class LevelReader:
                 return port
         for port in self.sl_ports:
             if player_rect.colliderect(port.rect):
+                print("slow")
                 return port
         for port in self.sp_ports:
             if player_rect.colliderect(port.rect):
+                print("fast")
                 return port
               
         # 3. ПРИЗЕМЛЕНИЕ НА ПЛАТФОРМЫ И ПОЛУБЛОКИ

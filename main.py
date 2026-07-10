@@ -312,7 +312,7 @@ while running:
             elif hit_object.type == "SHIP_P":
                 level.game_mode = GameState.SHIP
                 player.size = 40
-                player.texture_path = "media/textures/ship.jpg"
+                player.texture_path = "media/textures/ship.png2"
                 player.texture = pygame.image.load(player.texture_path).convert_alpha()
                 player.texture = pygame.transform.scale(
                     player.texture, (player.size, player.size)
@@ -332,11 +332,11 @@ while running:
                 player.texture = pygame.image.load(player.texture_path).convert_alpha()
                 player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
             elif hit_object.type == "SLOW_P":
-                player.game_speed -=0.25
-                level.game_speed -=0.25
+                player.game_speed -=0.5
+                level.game_speed -=0.5
             elif hit_object.type == "SPEED_P":
-                player.game_speed += 0.25
-                level.game_speed +=0.25
+                player.game_speed += 0.5
+                level.game_speed +=0.5
                 
                 
 

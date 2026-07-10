@@ -1,7 +1,6 @@
 import pygame
 from settings import SCREEN_WIDTH, RED, BLOCK_SIZE
 from objects import (
-    Object,
     DoubleJumpOrb,
     GravityChangeOrb,
     Platform,
@@ -24,6 +23,7 @@ class LevelReader:
         self.score = 0
         self.world_offset = 0
         self.game_speed = lvl.lvl_speed
+        self.finish_line=lvl.finish_line
         self.obstacles = []
         self.ceil_obstacles = []
         self.platforms = []
@@ -231,21 +231,26 @@ class LevelReader:
                                 player.jump()
                                 player_rect.y = player.y
                                 return None
+            if not player.on_platform:
+                player.can_jump = False
 
         # 4. УДАР БОКОМ В СТЕНУ
-        if not player.on_platform or  (player.y >= player.floor_y - player.size):
+        if player.gravity < 0 or (player.gravity > 0 and not player.on_platform) or (player.y >= player.floor_y - player.size):
             for plat in self.platforms + self.slabs:
                 p_rect = plat.rect
+                
                 if player_rect.colliderect(p_rect):
-                    if (
-                        player_rect.right >= p_rect.left
-                        and player_rect.left < p_rect.left
-                    ):
+                    # Проверяем, что это именно боковое столкновение (движение вправо)
+                    if player_rect.right >= p_rect.left and player_rect.left < p_rect.left:
+                        
+                        # При обычной гравитации: врезался боком, находясь в воздухе
                         if player.gravity > 0 and player_rect.bottom > p_rect.top + 10:
                             return plat
+                        
+                        # При отрицательной гравитации: врезался боком, скользя по потолку/платформе
                         if player.gravity < 0 and player_rect.top < p_rect.bottom - 10:
                             return plat
-
+                            
         return None
 
     def draw(self, screen):

@@ -75,6 +75,7 @@ class Spike(Object):
                 (self.rect.right, self.rect.bottom),
             ]
         pygame.draw.polygon(screen, RED, points)
+        pygame.draw.polygon(screen, (0, 255, 255), points, 1)
 
 class CeilingSpike(Object):
     def __init__(self, x, y):
@@ -87,6 +88,7 @@ class CeilingSpike(Object):
                 (self.rect.right, self.rect.top),
             ]
         pygame.draw.polygon(screen, RED, points)
+        pygame.draw.polygon(screen, (0, 255, 255), points, 1)
 class ShipPortal(Object):
     def __init__(self, x, y):
         super().__init__(x, y, width=BLOCK_SIZE, height=BLOCK_SIZE*3)

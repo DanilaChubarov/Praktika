@@ -1,5 +1,6 @@
 import pygame
 import sys
+import random
 from settings import (
     SCREEN_HEIGHT,
     SCREEN_WIDTH,
@@ -293,6 +294,7 @@ while running:
 
         if hit_object is not None:  # Игрок столкнулся с каким-то орбом
             if hit_object.type == "DEATH":
+                print(random.random())
                 game_state = "game_over"
                 pygame.mixer.music.stop()  # Останавливаем музыку при смерти
 
@@ -328,11 +330,11 @@ while running:
                 player.texture = pygame.image.load(player.texture_path).convert_alpha()
                 player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
             elif hit_object.type == "SLOW_P":
-                player.game_speed -=0.25
-                level.game_speed -=0.25
+                player.game_speed -=0.5
+                level.game_speed -=0.5
             elif hit_object.type == "SPEED_P":
-                player.game_speed += 0.25
-                level.game_speed +=0.25
+                player.game_speed += 0.5
+                level.game_speed +=0.5
                 
                 
 

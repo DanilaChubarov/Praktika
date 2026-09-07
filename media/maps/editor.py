@@ -21,7 +21,7 @@ GRID_COLS = 300 # Изначальная длина уровня (расшири
 FPS = 60
 
 # Имя файла для импорта/экспорта (лежит в той же папке maps)
-MAP_FILE_NAME = "level3_map.txt"
+MAP_FILE_NAME = "level2_sec_map.txt"
 map_path = os.path.join(current_dir, MAP_FILE_NAME)
 
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))

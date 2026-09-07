@@ -294,7 +294,7 @@ while running:
 
         if hit_object is not None:  # Игрок столкнулся с каким-то орбом
             if hit_object.type == "DEATH":
-                print(random.random())
+                #print("DEATH")
                 game_state = "game_over"
                 pygame.mixer.music.stop()  # Останавливаем музыку при смерти
 
@@ -314,6 +314,7 @@ while running:
             elif hit_object.type == "SHIP_P":
                 level.game_mode = GameState.SHIP
                 player.size = 40
+                player_rect = 40
                 player.texture_path = "media/textures/ship.png"
                 player.texture = pygame.image.load(player.texture_path).convert_alpha()
                 player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
@@ -321,12 +322,14 @@ while running:
                 level.game_mode = GameState.CUBE
                 player.texture_path = "media/textures/basket_ball.png"
                 player.size = 40
+                player_rect = 40
                 player.texture = pygame.image.load(player.texture_path).convert_alpha()
                 player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
             elif hit_object.type == "WAVE_P":
                 level.game_mode = GameState.WAVE
                 player.texture_path = "media/textures/wave.png"
                 player.size = 30
+                player_rect = 20
                 player.texture = pygame.image.load(player.texture_path).convert_alpha()
                 player.texture = pygame.transform.scale(player.texture, (player.size, player.size))
             elif hit_object.type == "SLOW_P":
@@ -335,6 +338,9 @@ while running:
             elif hit_object.type == "SPEED_P":
                 player.game_speed += 0.5
                 level.game_speed +=0.5
+            elif hit_object.type == "RESET_SPEED":
+                player.game_speed = 9
+                level.game_speed = 9
                 
                 
 

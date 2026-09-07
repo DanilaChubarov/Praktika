@@ -11,7 +11,8 @@ from objects import (
     CubePortal,
     WavePortal,
     SlowPortal,
-    SpeedPortal
+    SpeedPortal,
+    ResetSpeedPortal
 )
 from enum import Enum, auto
 
@@ -35,6 +36,7 @@ class LevelReader:
         self.w_ports = []
         self.sp_ports = []
         self.sl_ports = []
+        self.r_ports =[]
         
         self.game_mode = GameState.CUBE
 
@@ -85,6 +87,8 @@ class LevelReader:
                     self.sl_ports.append(SlowPortal(x, y))
                 elif char == ">":
                     self.sp_ports.append(SpeedPortal(x, y))
+                elif char == "R":
+                    self.r_ports.append(ResetSpeedPortal(x, y))
 
     def update(self):
         # Движение фона
@@ -137,6 +141,9 @@ class LevelReader:
         for port in self.sp_ports:
             port.rect.x -= self.game_speed
         self.sp_ports = [port for port in self.sp_ports if port.rect.right > 0]
+        for port in self.r_ports:
+            port.rect.x -= self.game_speed
+            self.r_ports = [port for port in self.r_ports if port.rect.right > 0]
 
     def check_collisions(self, player_rect, player, space_held=False):
         # ВАЖНО: сбрасываем флаг платформы в начале каждого кадра,
@@ -176,6 +183,9 @@ class LevelReader:
         for port in self.sp_ports:
             if player_rect.colliderect(port.rect):
                 return port
+        for port in self.r_ports:
+            if player_rect.colliderect(port.rect):
+                return port
               
         # 3. ПРИЗЕМЛЕНИЕ НА ПЛАТФОРМЫ И ПОЛУБЛОКИ
         if player.gravity > 0:
@@ -188,6 +198,8 @@ class LevelReader:
                     p_rect.x, p_rect.y - 8, p_rect.width, p_rect.height + 8
                 )
                 if player_rect.colliderect(landing_zone):
+                    if self.game_mode== GameState.WAVE:
+                        return plat
                     if player.vel_y >= 0:
                         if (player_rect.bottom - player.vel_y) <= p_rect.top + 8:
                             player.y = p_rect.top - player.size
@@ -215,6 +227,8 @@ class LevelReader:
                     p_rect.x, p_rect.y, p_rect.width, p_rect.height + 8
                 )
                 if player_rect.colliderect(landing_zone):
+                    if self.game_mode== GameState.WAVE:
+                        return plat
                     if player.vel_y <= 0:
                         if (player_rect.top - player.vel_y) >= p_rect.bottom - 8:
                             player.y = p_rect.bottom
@@ -283,6 +297,8 @@ class LevelReader:
         for port in self.sl_ports:
             port.draw(screen)
         for port in self.sp_ports:
+            port.draw(screen)
+        for port in self.r_ports:
             port.draw(screen)
 
     def play_music(self):

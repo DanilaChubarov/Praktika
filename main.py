@@ -25,6 +25,8 @@ pygame.mixer.init()
 # Настройка окна
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Ball Dash")
+icon =pygame.image.load("media/textures/basket_ball.png")
+pygame.display.set_icon(icon)
 clock = pygame.time.Clock()
 
 # Переменные мира

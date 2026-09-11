@@ -11,12 +11,12 @@ from settings import (
 from player import Player
 from levels_reader import LevelReader, GameState
 
-# Импортируем уровни
+
 from levels.level1 import LevelOne
 from levels.level2 import LevelTwo
 from levels.level3 import LevelThree
 
-# Инициализация Pygame
+
 pygame.mixer.pre_init(frequency=44100, size=-16, channels=2, buffer=2048)
 pygame.init()
 pygame.mixer.init()
@@ -29,7 +29,7 @@ icon =pygame.image.load("media/textures/basket_ball.png")
 pygame.display.set_icon(icon)
 clock = pygame.time.Clock()
 
-# Переменные мира
+
 floor_y = SCREEN_HEIGHT - 60
 FINISH_LINE = 22000
 
@@ -42,17 +42,18 @@ btn_height = 180
 spacing = 70
 total_width = btn_width * 3 + spacing * 2
 start_x = (SCREEN_WIDTH - total_width) // 2 - 30
+god_mode_on= False
 
 game_over_timer = 0
 
-# Кнопки уровней (прямоугольники)
+
 LEVEL1_BTN = pygame.Rect(start_x, 160, btn_width, btn_height)
 LEVEL2_BTN = pygame.Rect(start_x + btn_width + spacing, 160, btn_width, btn_height)
 LEVEL3_BTN = pygame.Rect(
     start_x + (btn_width + spacing) * 2, 160, btn_width, btn_height
 )
 
-# Загрузка картинок для кнопок уровней
+
 level1_btn_img = pygame.image.load("media/background/level1_bg.jpg").convert()
 level1_btn_img = pygame.transform.scale(level1_btn_img, (btn_width, btn_height))
 
@@ -83,11 +84,11 @@ def draw_menu():
     font_level = pygame.font.SysFont(None, 40, bold=True)
     font_small = pygame.font.SysFont(None, 30)
 
-    # Заголовок
+
     title = font_title.render("BALL DASH", True, WHITE)
     screen.blit(title, (SCREEN_WIDTH // 2 - title.get_width() // 2, 30))
 
-    # ---------- КНОПКА LEVEL 1 ----------
+
     screen.blit(level1_btn_img, (LEVEL1_BTN.x, LEVEL1_BTN.y))
     pygame.draw.rect(screen, WHITE, LEVEL1_BTN, 2, border_radius=15)
     # pygame.draw.rect(screen, color1, LEVEL1_BTN, border_radius=15)
@@ -102,7 +103,7 @@ def draw_menu():
     play = font_small.render("▶ PLAY", True, WHITE)
     screen.blit(play, (LEVEL1_BTN.centerx - play.get_width() // 2, LEVEL1_BTN.y + 150))
 
-    # ---------- КНОПКА LEVEL 2 ----------
+
     screen.blit(level2_btn_img, (LEVEL2_BTN.x, LEVEL2_BTN.y))
     pygame.draw.rect(screen, WHITE, LEVEL2_BTN, 2, border_radius=15)
 
@@ -115,7 +116,7 @@ def draw_menu():
     play = font_small.render("▶ PLAY", True, WHITE)
     screen.blit(play, (LEVEL2_BTN.centerx - play.get_width() // 2, LEVEL2_BTN.y + 150))
 
-    # ---------- КНОПКА LEVEL 3 ----------
+
     screen.blit(level3_btn_img, (LEVEL3_BTN.x, LEVEL3_BTN.y))
     pygame.draw.rect(screen, WHITE, LEVEL3_BTN, 2, border_radius=15)
 
@@ -128,9 +129,11 @@ def draw_menu():
     play = font_small.render("▶ PLAY", True, WHITE)
     screen.blit(play, (LEVEL3_BTN.centerx - play.get_width() // 2, LEVEL3_BTN.y + 150))
 
-    # Подсказка внизу
+    # подсказка внизу
     # hint = font_small.render("Нажми на кнопку мышкой", True, WHITE)
     # screen.blit(hint, (SCREEN_WIDTH // 2 - hint.get_width() // 2, SCREEN_HEIGHT - 30))
+    if god_mode_on:
+        pygame.draw.rect(screen, WHITE, (SCREEN_WIDTH-10, SCREEN_HEIGHT-10,10,10))
 
     pygame.display.flip()
 
@@ -197,7 +200,7 @@ def reset_game(level_class):
     return player, level, curr_lvl
 
 
-# Инициализация
+# инициализация
 selected_level = LevelOne
 player, level, curr_lvl = reset_game(selected_level)
 game_state = "menu"
@@ -212,8 +215,11 @@ while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-
-            # Проверка кликов по кнопкам
+                
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_g:
+                god_mode_on = not god_mode_on
+                
+                
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if LEVEL1_BTN.collidepoint(event.pos):
                     selected_level = LevelOne
@@ -235,8 +241,8 @@ while running:
                     game_state = "playing"
                     level.play_music()
                     space_pressed = False
+                
 
-            # Выход по ESC
             if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                 running = False
 
@@ -244,7 +250,7 @@ while running:
 
         just_pressed = False
         escaped_to_menu = False
-        # Обработка событий игрового процесса
+     
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -260,7 +266,7 @@ while running:
                     except:
                         pass
                     escaped_to_menu = True
-                    break  # прерываем обработку остальных событий в этом кадре
+                    break  
 
                 if event.key == pygame.K_SPACE:
                     space_pressed = True
@@ -270,7 +276,6 @@ while running:
                         player.jump()
                     if level.game_mode == GameState.SHIP:
                         player.fly(space_pressed)
-
             if event.type == pygame.KEYUP and event.key == pygame.K_SPACE:
                 space_pressed = False
 
@@ -283,22 +288,20 @@ while running:
                     player.fly(space_pressed)
 
         if escaped_to_menu:
-            # Уже перешли в меню — не выполняем физику/отрисовку игры в этом кадре
             continue
 
-            # Физика и обновление
+            # физика и обновление
         player.update(level.game_mode, space_held=space_pressed)
         level.update()
 
-        # Вызываем проверку один раз и сохраняем результат в переменную
         player_rect = player.get_rect()
         hit_object = level.check_collisions(player_rect, player, space_pressed)
 
-        if hit_object is not None:  # Игрок столкнулся с каким-то орбом
-            if hit_object.type == "DEATH":
+        if hit_object is not None:  # игрок столкнулся с каким-то орбом
+            if hit_object.type == "DEATH" and not god_mode_on:
                 #print("DEATH")
                 game_state = "game_over"
-                pygame.mixer.music.stop()  # Останавливаем музыку при смерти
+                pygame.mixer.music.stop()  
 
             elif hit_object.type == "DBL_JMP" and just_pressed:
                 level.dj_orbs.remove(hit_object)
@@ -346,7 +349,6 @@ while running:
                 
                 
 
-        # Проверка победы (достижение финиша)
         if level.world_offset >= level.finish_line:
             game_state = "victory"
             try:
@@ -354,12 +356,10 @@ while running:
             except:
                 pass
 
-        # Отрисовка игры
 
         level.draw(screen)
         player.draw(screen, level.game_mode)
 
-        # UI
         font = pygame.font.SysFont(None, 36)
         percent = get_progress_percent(level)
         progress_text = font.render(f"Прогресс: {percent}%", True, WHITE)
@@ -373,7 +373,6 @@ while running:
             pygame.mixer.music.stop()
         except:
             pass
-        # перезапуск через 2 секунды
         game_over_timer += 1
         if game_over_timer >= FPS * 2:
             player, level, curr_lvl = reset_game(selected_level)
@@ -397,8 +396,7 @@ while running:
                         pygame.mixer.music.stop()
                     except:
                         pass
-
-                # SPACE → мгновенный рестарт
+                    
                 if event.key == pygame.K_SPACE:
                     player, level, curr_lvl = reset_game(selected_level)
                     game_state = "playing"
@@ -429,7 +427,6 @@ while running:
                     except:
                         pass
 
-                # SPACE → перезапустить уровень заново
                 if event.key == pygame.K_SPACE:
                     player, level, curr_lvl = reset_game(selected_level)
                     game_state = "playing"

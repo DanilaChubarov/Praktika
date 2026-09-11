@@ -46,7 +46,6 @@ class LevelReader:
         self.bg_x1 = lvl.bg_x1
         self.bg_x2 = lvl.bg_x2
         self.bg_speed = lvl.bg_speed
-        # Загружаем музыку
         try:
             pygame.mixer.music.load(lvl.music_name)
         except:
@@ -56,8 +55,6 @@ class LevelReader:
 
         pygame.mixer.music.load(lvl.music_name)
 
-        BLOCK_SIZE = 40
-        START_OFFSET = 0
       
         
         for row_index, row in enumerate(lvl.map):
@@ -91,7 +88,6 @@ class LevelReader:
                     self.r_ports.append(ResetSpeedPortal(x, y))
 
     def update(self):
-        # Движение фона
         self.bg_x1 -= self.bg_speed
         self.bg_x2 -= self.bg_speed
         if self.bg_x1 <= -SCREEN_WIDTH:
@@ -146,12 +142,8 @@ class LevelReader:
             self.r_ports = [port for port in self.r_ports if port.rect.right > 0]
 
     def check_collisions(self, player_rect, player, space_held=False):
-        # ВАЖНО: сбрасываем флаг платформы в начале каждого кадра,
-        # иначе проверка удара об стену (пункт 4) перестанет работать
-        # после первого приземления.
         player.on_platform = False
 
-        # 1. Обычные и потолочные шипы — смерть
         for spike in self.obstacles:
             if player_rect.colliderect(spike.rect):
                 return spike
@@ -160,7 +152,6 @@ class LevelReader:
             if player_rect.colliderect(c_spike.rect):
                 return c_spike
 
-        # 2. ПРОВЕРЯЕМ ОРБЫ
         for orb in self.dj_orbs:
             if player_rect.colliderect(orb.rect):
                 return orb
@@ -186,8 +177,7 @@ class LevelReader:
         for port in self.r_ports:
             if player_rect.colliderect(port.rect):
                 return port
-              
-        # 3. ПРИЗЕМЛЕНИЕ НА ПЛАТФОРМЫ И ПОЛУБЛОКИ
+
         if player.gravity > 0:
             
             player.on_platform = False
@@ -246,20 +236,13 @@ class LevelReader:
             if not player.on_platform:
                 player.can_jump = False
 
-        # 4. УДАР БОКОМ В СТЕНУ
         if player.gravity < 0 or (player.gravity > 0 and not player.on_platform) or (player.y >= player.floor_y - player.size):
             for plat in self.platforms + self.slabs:
-                p_rect = plat.rect
-                
+                p_rect = plat.rect            
                 if player_rect.colliderect(p_rect):
-                    # Проверяем, что это именно боковое столкновение (движение вправо)
                     if player_rect.right >= p_rect.left and player_rect.left < p_rect.left:
-                        
-                        # При обычной гравитации: врезался боком, находясь в воздухе
                         if player.gravity > 0 and player_rect.bottom > p_rect.top + 10:
                             return plat
-                        
-                        # При отрицательной гравитации: врезался боком, скользя по потолку/платформе
                         if player.gravity < 0 and player_rect.top < p_rect.bottom - 10:
                             return plat
                             
